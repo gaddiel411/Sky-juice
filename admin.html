@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Ventas | Sky Juice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        /* Escondemos el panel hasta que la contraseña sea correcta */
+        #panel-ventas { display: none; }
+    </style>
+</head>
+<body class="bg-slate-100 font-sans">
+
+    <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-xl shadow-2xl max-w-sm w-full border-t-4 border-teal-600">
+            <h2 class="text-2xl font-black text-slate-800 mb-6 text-center uppercase tracking-tighter">Acceso Admin</h2>
+            <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-4 border-2 rounded-lg mb-4 outline-none focus:border-teal-500 text-center font-bold">
+            <button onclick="verificar()" class="w-full bg-teal-600 text-white py-4 rounded-lg font-bold hover:bg-teal-700 transition">ENTRAR</button>
+            <p id="errorMsg" class="text-red-500 text-xs mt-4 text-center font-bold hidden">⚠️ Contraseña incorrecta</p>
+        </div>
+    </div>
+
+    <div id="panel-ventas" class="p-4 md:p-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div>
+                    <h1 class="text-3xl font-black text-slate-800 uppercase tracking-tighter">Sky Juice <span class="text-teal-600">Admin</span></h1>
+                    <p class="text-slate-400 text-xs font-bold">Cd. Obregón, Son.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="cargarDatos()" class="bg-slate-200 px-4 py-2 rounded font-bold text-xs">🔄</button>
+                    <button onclick="exportarExcel()" class="bg-green-600 text-white px-6 py-2 rounded font-bold text-xs uppercase shadow-lg">Descargar Excel</button>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+                <table id="tabla-pedidos" class="w-full text-left">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-[10px] text-slate-500 uppercase font-bold tracking-widest">
+                        <tr><th class="p-4">Fecha</th><th class="p-4">Cliente</th><th class="p-4">WhatsApp</th><th class="p-4">Dirección</th><th class="p-4">Cant.</th></tr>
+                    </thead>
+                    <tbody id="contenido-tabla" class="text-sm text-slate-700 font-medium"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN
+        const MI_PASSWORD = "123"; // <-- CAMBIA TU CONTRASEÑA AQUÍ
+        const URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuwJooBcLa4w5CL9ZR2tWBwduiJGsXiPMUkIauf7oaqOCSOws5cNnfUJQKOhQapoR1lM1VEAh6VrkV/pub?output=csv";
+
+        function verificar() {
+            const input = document.getElementById('passInput').value;
+            if(input === MI_PASSWORD) {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('panel-ventas').style.display = 'block';
+                cargarDatos();
+            } else {
+                document.getElementById('errorMsg').classList.remove('hidden');
+                document.getElementById('passInput').value = "";
+            }
+        }
+
+        // El resto del código para cargar los datos...
+        function cargarDatos() {
+            fetch(URL_CSV + "&cb=" + new Date().getTime())
+                .then(r => r.text())
+                .then(texto => {
+                    const filas = texto.split(/\r?\n/).slice(1);
+                    let html = "";
+                    filas.forEach(fila => {
+                        const c = fila.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                        if (c.length >= 4) {
+                            html += `<tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                                <td class="p-4 text-[10px] text-slate-400">${c[0].replace(/"/g, '')}</td>
+                                <td class="p-4 font-bold text-slate-800">${c[1].replace(/"/g, '')}</td>
+                                <td class="p-4 font-bold text-teal-600">${c[2].replace(/"/g, '')}</td>
+                                <td class="p-4 text-xs">${c[3].replace(/"/g, '')}</td>
+                                <td class="p-4 text-center font-black">${c[4] ? c[4].replace(/"/g, '') : '1'}</td>
+                            </tr>`;
+                        }
+                    });
+                    document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-10 text-center">Sin pedidos.</td></tr>';
+                });
+        }
+
+        function exportarExcel() {
+            const lib = XLSX.utils.table_to_book(document.getElementById("tabla-pedidos"));
+            XLSX.writeFile(lib, "Ventas_Obregon.xlsx");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Pedido | Sky Juice</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4 font-sans">
+    <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-lg p-6 border-t-8 border-teal-600 mt-6">
+        <h2 class="text-xl font-bold text-center mb-6 uppercase tracking-tight text-gray-800">Confirmar Recolección</h2>
+        
+        <form id="pagoForm" class="space-y-5">
+            <div>
+                <label class="text-xs font-bold text-gray-400 uppercase">Su Nombre</label>
+                <input type="text" id="nombre" required placeholder="Nombre Completo" class="w-full p-4 border-2 rounded outline-none focus:border-teal-500">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-gray-400 uppercase">Su WhatsApp</label>
+                <input type="tel" id="whatsapp" required pattern="[0-9]{10}" placeholder="6441234567" class="w-full p-4 border-2 rounded outline-none focus:border-teal-500">
+            </div>
+
+            <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
+                <p class="text-xs font-bold text-teal-800 uppercase mb-1">Entregas en:</p>
+                <p class="text-lg font-bold text-gray-800">Calle Ejemplo #123, Colonia Centro</p>
+                <p class="text-xs text-teal-600 uppercase mt-1 tracking-widest font-bold">Cd. Obregón, Sonora</p>
+            </div>
+            
+            <div class="bg-blue-50 p-5 rounded-md text-sm border border-blue-100">
+                <p class="font-bold text-blue-900 mb-2 underline tracking-wider uppercase">Paso 1: Realizar Transferencia</p>
+                <p><strong>Banco:</strong> BBVA</p>
+                <p><strong>CLABE:</strong> 0000 0000 0000 0000 00</p>
+                <p><strong>Titular:</strong> Sky Juice Obregón</p>
+            </div>
+
+            <div class="p-2 text-center">
+                <p class="text-xs font-bold text-gray-500 italic">
+                    Una vez hecha la transferencia, toca el botón de abajo donde te llevará a mi WhatsApp y me mandaras foto del comprobante.
+                </p>
+            </div>
+
+            <button type="submit" class="w-full bg-green-600 text-white font-black py-5 rounded shadow-xl uppercase hover:bg-green-700 transition tracking-widest">
+                Confirmar y enviar comprobante
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const cant = params.get('cant') || 1;
+
+        document.getElementById('pagoForm').onsubmit = function(e) {
+            e.preventDefault();
+            const nom = document.getElementById('nombre').value;
+            const tel = document.getElementById('whatsapp').value;
+            // Como ya no pedimos dirección, enviamos "RECOLECCIÓN EN CASA" al Excel
+            const dir = "RECOLECCIÓN EN CASA";
+
+            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
+            const data = new FormData();
+            data.append("entry.1983084318", nom); 
+            data.append("entry.134371465", tel);  
+            data.append("entry.338561705", dir);  
+            data.append("entry.1018610744", cant); 
+
+            fetch(formURL, { method: "POST", mode: "no-cors", body: data });
+
+            const miTel = "526441880995"; 
+            const msg = `HOLA SKY JUICE, NUEVO PEDIDO:%0A👤:${nom}%0A📱:${tel}%0A📦:${cant} botellas.%0APASARÉ POR ELLAS A LA CASA.%0AAQUÍ TENGO MI COMPROBANTE DE PAGO.`;
+            window.location.href = `https://wa.me/${miTel}?text=${msg}`;
+        };
+    </script>
+</body>
+</html>
