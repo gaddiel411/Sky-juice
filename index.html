@@ -3,44 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Juice | Ciudad Obregón</title>
+    <title>Sky Juice | Jugos Naturales</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sold-out { filter: grayscale(1); opacity: 0.6; pointer-events: none; }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans">
-    <header class="bg-white border-b-2 border-teal-600 shadow-sm sticky top-0 z-50">
-        <nav class="max-w-4xl mx-auto p-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">SKY <span class="text-teal-600 font-light">JUICE</span></h1>
-            <div class="text-right">
-                <span class="block text-[10px] font-bold text-teal-700 uppercase tracking-widest">Entrega Local</span>
-                <span class="text-sm font-bold text-gray-900">Cd. Obregón, Son.</span>
-            </div>
-        </nav>
-        <div class="bg-teal-600 text-white text-center py-1 text-xs font-medium">📍 Entregas a domicilio únicamente en Ciudad Obregón</div>
+<body class="bg-slate-50 font-sans">
+
+    <header class="bg-teal-600 text-white p-6 text-center shadow-lg">
+        <h1 class="text-4xl font-black italic tracking-tighter">SKY JUICE</h1>
+        <p class="text-xs uppercase tracking-widest font-bold mt-1">Obregón, Sonora</p>
     </header>
 
-    <main class="max-w-4xl mx-auto p-6 mt-6">
-        <div class="bg-white shadow-xl rounded-lg overflow-hidden grid md:grid-cols-2 gap-8 p-8 border border-gray-100">
-            <div class="flex justify-center items-center bg-gray-50 rounded-lg p-4">
-                <img src="producto.png" alt="Sky Juice" class="max-h-80 object-contain">
-            </div>
-            <div class="flex flex-col justify-center text-center md:text-left">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4 uppercase">Bebida Sky Juice</h2>
-                <p class="text-lg text-gray-600 mb-6">Bienestar natural directo a su hogar. Sabor y salud en cada botella.</p>
-                <div class="mb-8 text-4xl font-bold text-teal-700">$500.00 MXN</div>
-                <div class="bg-teal-50 p-4 rounded-md border border-teal-100 mb-6">
-                    <label class="block text-sm font-bold text-teal-800 mb-2">Cantidad de botellas:</label>
-                    <input type="number" id="cantidad" value="1" min="1" class="w-full p-3 text-xl border-2 border-teal-200 rounded-md text-center font-bold outline-none">
-                </div>
-                <button onclick="irAPagar()" class="w-full bg-teal-700 text-white font-bold py-5 rounded-md hover:bg-teal-800 transition shadow-lg text-lg uppercase tracking-wider">Hacer mi pedido ahora</button>
+    <main class="max-w-md mx-auto p-4 pb-24">
+        
+        <div id="stock-banner" class="bg-white p-4 rounded-2xl shadow-sm border-2 mb-6 text-center">
+            <span class="text-xs font-black text-slate-400 uppercase block mb-1">Disponibilidad Actual</span>
+            <div class="flex items-center justify-center gap-2">
+                <span id="txt-stock" class="text-3xl font-black text-slate-800">Cargando...</span>
+                <span class="text-teal-600 font-bold text-sm">botellas</span>
             </div>
         </div>
+
+        <div id="card-producto" class="bg-white rounded-3xl overflow-hidden shadow-xl border border-slate-200 mb-8">
+            <img src="producto.png" alt="Jugo Sky Juice" class="w-full h-64 object-cover">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="text-2xl font-black text-slate-800 uppercase">Jugo Natural</h2>
+                    <span class="bg-teal-100 text-teal-700 px-3 py-1 rounded-full font-black text-lg">$50</span>
+                </div>
+                <p class="text-slate-500 text-sm mb-6">Prensado en frío, 100% fruta natural sin conservadores. ¡Pide el tuyo antes de que se acaben!</p>
+                
+                <form id="form-pedido" action="https://docs.google.com/forms/d/e/1FAIpQLSfpQ04sAcRnnwcRva1WYrXQ_0YXTZgR_TatbApG4MAyMvQAiw/formResponse" method="POST" class="space-y-4">
+                    
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Tu Nombre</label>
+                        <input type="text" name="entry.2005620554" placeholder="Ej. Juan Pérez" required 
+                               class="w-full p-4 bg-slate-100 rounded-2xl border-2 border-transparent focus:border-teal-500 outline-none font-bold transition-all">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">WhatsApp</label>
+                        <input type="tel" name="entry.1045701091" placeholder="644 123 4567" required 
+                               class="w-full p-4 bg-slate-100 rounded-2xl border-2 border-transparent focus:border-teal-500 outline-none font-bold transition-all">
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2">¿Cuántos quieres?</label>
+                        <select name="entry.839337160" id="cantidad-select" class="w-full p-4 bg-slate-100 rounded-2xl border-2 border-transparent focus:border-teal-500 outline-none font-bold appearance-none">
+                            <option value="1 Jugo">1 Jugo ($50)</option>
+                            <option value="2 Jugos">2 Jugos ($100)</option>
+                            <option value="3 Jugos">3 Jugos ($150)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="btn-comprar" 
+                            class="w-full bg-teal-600 text-white py-5 rounded-2xl font-black text-xl shadow-lg shadow-teal-200 hover:bg-teal-700 active:scale-95 transition-all">
+                        HACER PEDIDO
+                    </button>
+                    <p id="msg-agotado" class="text-red-500 font-black text-center hidden uppercase text-sm">Lo sentimos, por hoy se han agotado los jugos.</p>
+                </form>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        function irAPagar() {
-            const cant = document.getElementById('cantidad').value;
-            window.location.href = `checkout.html?cant=${cant}`;
+        // LEER EL STOCK DEL STORAGE (Sincronizado con Admin)
+        function actualizarInterfaz() {
+            let stockActual = localStorage.getItem('skyJuiceStock') ? parseInt(localStorage.getItem('skyJuiceStock')) : 0;
+            
+            const txtStock = document.getElementById('txt-stock');
+            const btnComprar = document.getElementById('btn-comprar');
+            const msgAgotado = document.getElementById('msg-agotado');
+            const card = document.getElementById('card-producto');
+            const banner = document.getElementById('stock-banner');
+
+            txtStock.innerText = stockActual;
+
+            if (stockActual <= 0) {
+                txtStock.innerText = "AGOTADO";
+                txtStock.classList.add('text-red-600');
+                btnComprar.disabled = true;
+                btnComprar.classList.add('bg-slate-300', 'shadow-none', 'cursor-not-allowed');
+                btnComprar.innerText = "NO DISPONIBLE";
+                msgAgotado.classList.remove('hidden');
+                card.classList.add('sold-out');
+                banner.classList.add('border-red-200');
+            } else {
+                txtStock.classList.remove('text-red-600');
+                btnComprar.disabled = false;
+                btnComprar.classList.remove('bg-slate-300');
+                btnComprar.classList.add('bg-teal-600');
+                btnComprar.innerText = "HACER PEDIDO";
+                msgAgotado.classList.add('hidden');
+                card.classList.remove('sold-out');
+                banner.classList.remove('border-red-200');
+            }
         }
+
+        // Ejecutar al cargar la página
+        actualizarInterfaz();
+
+        // Escuchar si el Admin cambia el stock en otra pestaña
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'skyJuiceStock') {
+                actualizarInterfaz();
+            }
+        });
     </script>
 </body>
 </html>
