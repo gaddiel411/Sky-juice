@@ -7,84 +7,73 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4 font-sans">
-    <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-lg p-6 border-t-8 border-teal-600 mt-6">
-        <h2 class="text-xl font-bold text-center mb-6 uppercase tracking-tight text-gray-800">Confirmar Recolección</h2>
+    <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-[2rem] p-8 border-t-8 border-emerald-500 mt-6">
+        <h2 class="text-2xl font-black text-center mb-6 uppercase tracking-tight text-gray-800">Confirmar Pedido</h2>
         
         <form id="pagoForm" class="space-y-5">
             <div>
-                <label class="text-xs font-bold text-gray-400 uppercase">Su Nombre</label>
-                <input type="text" id="nombre" required placeholder="Nombre Completo" class="w-full p-4 border-2 rounded outline-none focus:border-teal-500">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tu Nombre</label>
+                <input type="text" id="nombre" required placeholder="Ej. Juan Pérez" class="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-emerald-500 bg-gray-50">
             </div>
             <div>
-                <label class="text-xs font-bold text-gray-400 uppercase">Su WhatsApp</label>
-                <input type="tel" id="whatsapp" required pattern="[0-9]{10}" placeholder="6441234567" class="w-full p-4 border-2 rounded outline-none focus:border-teal-500">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tu WhatsApp</label>
+                <input type="tel" id="whatsapp" required pattern="[0-9]{10}" placeholder="6441234567" class="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-emerald-500 bg-gray-50">
             </div>
 
-            <div class="bg-teal-50 p-4 rounded-lg border border-teal-200">
-                <p class="text-xs font-bold text-teal-800 uppercase mb-1">Entregas en:</p>
-                <p class="text-lg font-bold text-gray-800">Calle Ejemplo #123, Colonia Centro</p>
-                <p class="text-xs text-teal-600 uppercase mt-1 tracking-widest font-bold">Cd. Obregón, Sonora</p>
+            <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
+                <p class="text-[10px] font-black text-emerald-800 uppercase mb-1 tracking-widest">Punto de Entrega:</p>
+                <p class="text-sm font-bold text-gray-700">📍 Calle Ejemplo #123, Col. Centro, Cd. Obregón</p>
             </div>
             
-            <div class="bg-blue-50 p-5 rounded-md text-sm border border-blue-100">
-                <p class="font-bold text-blue-900 mb-2 underline tracking-wider uppercase">Paso 1: Realizar Transferencia</p>
-                <p><strong>Banco:</strong> BBVA</p>
-                <p><strong>CLABE:</strong> 0000 0000 0000 0000 00</p>
-                <p><strong>Titular:</strong> Sky Juice Obregón</p>
+            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
+                <p class="font-black text-blue-900 mb-3 uppercase text-xs tracking-widest">Paso 1: Pago por Transferencia</p>
+                <div class="text-sm space-y-1 text-blue-800">
+                    <p><strong>Banco:</strong> BBVA</p>
+                    <p><strong>CLABE:</strong> 0000 0000 0000 0000 00</p>
+                    <p><strong>Titular:</strong> Sky Juice Obregón</p>
+                </div>
             </div>
 
-            <div class="p-2 text-center">
-                <p class="text-xs font-bold text-gray-500 italic">
-                    Una vez hecha la transferencia, toca el botón de abajo donde te llevará a mi WhatsApp y me mandaras foto del comprobante.
-                </p>
-            </div>
-
-            <button type="submit" class="w-full bg-green-600 text-white font-black py-5 rounded shadow-xl uppercase hover:bg-green-700 transition tracking-widest">
+            <button type="submit" class="w-full bg-emerald-500 text-white font-black py-5 rounded-2xl shadow-lg shadow-emerald-100 uppercase tracking-widest hover:bg-emerald-600 transition-all">
                 Confirmar y enviar comprobante
             </button>
+            <p class="text-[10px] text-center text-gray-400 font-bold uppercase mt-4">Al dar clic se abrirá tu WhatsApp para enviar el comprobante</p>
         </form>
     </div>
 
-   <script>
-    const params = new URLSearchParams(window.location.search);
-    const cant = params.get('cant') || 1;
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const cant = params.get('cant') || 1;
 
-    document.getElementById('pagoForm').onsubmit = async function(e) {
-        e.preventDefault();
-        const nom = document.getElementById('nombre').value;
-        const tel = document.getElementById('whatsapp').value;
-        const dir = "RECOLECCIÓN EN CASA";
+        document.getElementById('pagoForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const nom = document.getElementById('nombre').value;
+            const tel = document.getElementById('whatsapp').value;
+            
+            // Texto automático para que el Excel no quede vacío
+            const dir = "RECOLECCIÓN EN PUNTO";
 
-        const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
-        
-        // Usamos URLSearchParams para asegurar compatibilidad total con Google Forms
-        const data = new URLSearchParams();
-        data.append("entry.1983084318", nom); 
-        data.append("entry.134371465", tel);  
-        data.append("entry.338561705", dir);  
-        data.append("entry.1018610744", cant); 
+            // URL DE TU FORMULARIO (La misma de tu link)
+            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
+            
+            const data = new URLSearchParams();
+            // USANDO TUS IDs REALES:
+            data.append("entry.796663698", nom);   // ID Nombre
+            data.append("entry.504990176", tel);   // ID WhatsApp
+            data.append("entry.1399542669", dir);  // ID Dirección (Auto)
+            data.append("entry.1018610744", cant); // ID Cantidad (Probable)
 
-        // Enviamos al Excel
-        try {
-            await fetch(formURL, { 
-                method: "POST", 
-                mode: "no-cors", 
-                body: data,
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            });
-        } catch (error) {
-            console.log("Error al registrar en Excel, procediendo a WhatsApp...");
-        }
+            // 1. Enviar al Excel silenciosamente
+            fetch(formURL, { method: "POST", mode: "no-cors", body: data });
 
-        // WhatsApp
-        const miTel = "526441880995"; 
-        const msg = `HOLA SKY JUICE, NUEVO PEDIDO:%0A👤: ${nom}%0A📱: ${tel}%0A📦: ${cant} botellas.%0APASARÉ POR ELLAS A LA CASA.%0AHe realizado la transferencia.`;
-        
-        // Un pequeño retraso de 300ms solo para asegurar el envío
-        setTimeout(() => {
-            window.location.href = `https://wa.me/${miTel}?text=${msg}`;
-        }, 300);
-    };
-</script>
+            // 2. Enviar a tu WhatsApp
+            const miTel = "526441880995"; 
+            const msg = `¡HOLA SKY JUICE!%0A👤 *Nombre:* ${nom}%0A📱 *WhatsApp:* ${tel}%0A📦 *Pedido:* ${cant} botellas.%0A📍 *Entrega:* Pasaré al punto fijo.%0A---%0AYA REALICÉ MI PAGO. AQUÍ ESTÁ MI COMPROBANTE:`;
+            
+            setTimeout(() => {
+                window.location.href = `https://wa.me/${miTel}?text=${msg}`;
+            }, 500);
+        };
+    </script>
 </body>
 </html>
