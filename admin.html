@@ -141,31 +141,48 @@
             }
         }
 
-        async function cargarDatos() {
-            try {
-                const response = await fetch(URL_CSV + "&nocache=" + new Date().getTime());
-                const csvData = await response.text();
-                const filas = csvData.split(/\r?\n/).slice(1);
-                let html = "";
+       async function cargarDatos() {
+    try {
+        // Agregamos un número aleatorio al final para que Google no nos mande datos viejos
+        const cacheBuster = new Date().getTime();
+        const response = await fetch(URL_CSV + "&nocache=" + cacheBuster);
+        const csvData = await response.text();
+        
+        // Dividimos por filas
+        const filas = csvData.split(/\r?\n/).slice(1);
+        let html = "";
 
-                filas.forEach(f => {
-                    const c = f.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    if (c.length >= 4) {
-                        html += `
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="p-4 text-[10px] text-slate-400 font-mono text-center">${c[0].replace(/"/g, '')}</td>
-                            <td class="p-4 font-bold text-slate-800 uppercase">${c[1].replace(/"/g, '')}</td>
-                            <td class="p-4 font-bold text-teal-600"><a href="https://wa.me/52${c[2].replace(/\D/g,'')}" target="_blank">📱 WhatsApp</a></td>
-                            <td class="p-4 text-xs italic text-slate-500">${c[3].replace(/"/g, '')}</td>
-                            <td class="p-4 text-center font-black text-slate-900">${c[4] ? c[4].replace(/"/g, '') : '1'}</td>
-                        </tr>`;
-                    }
-                });
-                document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-10 text-center font-bold text-slate-300 italic tracking-widest uppercase">No hay pedidos registrados aún</td></tr>';
-            } catch (e) {
-                console.error("Error al conectar con Google Sheets:", e);
+        filas.forEach(f => {
+            // Este código detecta si Google usa coma o punto y coma automáticamente
+            const c = f.split(/[,;](?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            
+            if (c.length >= 4) {
+                // Limpiamos las comillas que estorban
+                const fecha = c[0].replace(/"/g, '');
+                const nombre = c[1].replace(/"/g, '');
+                const whatsapp = c[2].replace(/"/g, '');
+                const entrega = c[3].replace(/"/g, '');
+                const cantidad = c[4] ? c[4].replace(/"/g, '') : '1';
+
+                html += `
+                <tr class="hover:bg-slate-50 transition-colors border-b border-slate-100">
+                    <td class="p-6 text-[11px] text-slate-400 font-mono text-center">${fecha}</td>
+                    <td class="p-6 font-black text-slate-800 uppercase italic">${nombre}</td>
+                    <td class="p-6 font-black text-teal-600">
+                        <a href="https://wa.me/${whatsapp.replace(/\D/g,'')}" target="_blank">📱 WhatsApp</a>
+                    </td>
+                    <td class="p-6 text-xs font-bold text-slate-500 uppercase">${entrega}</td>
+                    <td class="p-6 text-center font-black text-2xl text-slate-900">${cantidad}</td>
+                </tr>`;
             }
-        }
+        });
+        
+        document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-10 text-center font-bold text-slate-300 italic uppercase">No hay pedidos nuevos</td></tr>';
+        
+    } catch (e) {
+        console.error("Error al conectar con Google Sheets:", e);
+    }
+}
 
         function exportarExcel() {
             const lib = XLSX.utils.table_to_book(document.getElementById("tabla-pedidos"));
