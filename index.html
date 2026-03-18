@@ -1,94 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sky Juice | Obregón</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  body { font-family: 'Montserrat', sans-serif; background-color: #f7f7f7; }
-  button:active { transform: scale(0.95); transition: 0.1s; }
-  .agotado-img { filter: grayscale(1); opacity: 0.5; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sky Juice | Obregón</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+    </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-<div class="max-w-md mx-auto">
-  <h1 class="text-3xl font-extrabold text-center mb-1 italic tracking-tighter text-slate-900">SKY JUICE</h1>
-  <p class="text-center text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-6">📍 Solo Ciudad Obregón</p>
+    <div class="max-w-md mx-auto min-h-screen flex flex-col p-6">
+        <header class="text-center py-8">
+            <h1 class="text-4xl font-black italic tracking-tighter text-slate-800">SKY <span class="text-emerald-500">JUICE</span></h1>
+            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Natural & Fresh • Cd. Obregón</p>
+        </header>
 
-  <div class="bg-white rounded-[2.5rem] p-6 shadow-xl border border-gray-100 mb-6 text-center">
-    
-    <div id="status-stock" class="mb-4 inline-block px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-gray-100 text-gray-400">
-      Sincronizando inventario...
-    </div>
+        <div class="bg-white rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden border border-slate-100 relative">
+            <div class="p-2">
+                <img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1000&auto=format&fit=crop" 
+                     alt="Sky Juice Bottle" 
+                     class="w-full h-80 object-cover rounded-[2.5rem]">
+            </div>
+            
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-800 uppercase">Jugo de Caña</h2>
+                        <p class="text-sm text-slate-400 font-bold">Botella 500ml</p>
+                    </div>
+                    <span class="text-2xl font-black text-emerald-500">$40</span>
+                </div>
 
-    <img id="foto-producto" src="producto.png" onerror="this.src='https://images.unsplash.com/photo-1622597467836-f3285f2131b7?auto=format&fit=crop&w=500&q=80'" 
-         class="w-full h-64 object-cover rounded-[2rem] mb-6 shadow-inner transition-all duration-500">
-    
-    <div id="controles-venta" class="hidden">
-        <p class="text-4xl font-black text-slate-900 mb-8 tracking-tight">$50 <span class="text-sm text-slate-400 uppercase">mxn</span></p>
+                <div id="status-container" class="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full mb-8">
+                    <span id="ping-anim" class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                        ¡Quedan <span id="stock-num">--</span> disponibles!
+                    </span>
+                </div>
 
-        <div class="flex items-center justify-center gap-6 mb-8">
-          <button onclick="cambiarCant(-1)" class="w-14 h-14 text-2xl font-bold bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center shadow-sm text-slate-600">−</button>
-          <span id="cantidad-display" class="text-4xl font-black w-12 text-slate-800">1</span>
-          <button onclick="cambiarCant(1)" class="w-14 h-14 text-2xl font-bold bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-center shadow-sm text-slate-600">+</button>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between bg-slate-50 p-2 rounded-2xl border border-slate-100">
+                        <span class="text-[10px] font-black uppercase text-slate-400 px-4">Cantidad</span>
+                        <div class="flex items-center gap-4">
+                            <button onclick="cambiarCant(-1)" class="w-10 h-10 flex items-center justify-center font-bold text-xl text-slate-400 hover:text-slate-900">-</button>
+                            <input type="number" id="cantidad" value="1" readonly class="w-8 bg-transparent text-center font-black text-lg outline-none">
+                            <button onclick="cambiarCant(1)" class="w-10 h-10 flex items-center justify-center font-bold text-xl text-slate-400 hover:text-slate-900">+</button>
+                        </div>
+                    </div>
+
+                    <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-black py-5 rounded-[1.5rem] shadow-xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest text-sm">
+                        Ordenar Ahora
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <button onclick="irAPagar()" class="w-full bg-emerald-500 text-white text-lg font-black py-5 rounded-2xl shadow-lg shadow-emerald-100 uppercase tracking-widest hover:bg-emerald-600 transition-colors">
-          ORDENAR AHORA
-        </button>
+        <footer class="mt-auto py-8 text-center text-slate-300">
+            <p class="text-[9px] font-bold uppercase tracking-widest">© 2026 Sky Juice Obregón</p>
+        </footer>
     </div>
 
-    <div id="mensaje-agotado" class="hidden py-10">
-        <p class="text-2xl font-black text-slate-300 uppercase italic">Agotado por hoy</p>
-        <p class="text-xs text-slate-400 mt-2 font-bold uppercase tracking-widest font-sans">Volveremos pronto con más frescura</p>
-    </div>
-  </div>
-</div>
+    <script>
+        // LINK DE EXPORTACIÓN DIRECTA (SIN RETRASO)
+        const URL_INVENTARIO = "https://docs.google.com/spreadsheets/d/1vSuwJooBcLa4w5CL9ZR2tWBwduiJGsXiPMUkIauf7oaqOCSOws5cNnfUJQKOhQapoR1lM1VEAh6VrkV/export?format=csv&gid=506146758";
 
-<script>
-// LINK DE TU EXCEL (Asegúrate de que sea el que tiene el stock calculado)
-const LINK_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuwJooBcLa4w5CL9ZR2tWBwduiJGsXiPMUkIauf7oaqOCSOws5cNnfUJQKOhQapoR1lM1VEAh6VrkV/pub?gid=506146758&single=true&output=csv";
+        let stockReal = 0;
 
-let stockReal = 0;
+        async function cargarStock() {
+            try {
+                // El timestamp (t=...) obliga a Google a darnos el dato fresco
+                const res = await fetch(URL_INVENTARIO + "&t=" + new Date().getTime());
+                const data = await res.text();
+                const filas = data.split(/\r?\n/);
+                const columnas = filas[0].split(',');
+                
+                // La celda C1 es la posición 2
+                stockReal = parseInt(columnas[2]);
 
-async function cargarStock() {
-    try {
-        // El "nocache" es para que Google no guarde la versión vieja y siempre lea el stock nuevo
-        const res = await fetch(LINK_CSV + "&nocache=" + new Date().getTime());
-        const data = await res.text();
-        const filas = data.split('\n');
-        
-        // Buscamos el stock en la fila 1, columna C (índice 2)
-        const columnas = filas[0].split(',');
-        stockReal = parseInt(columnas[2]); 
+                const display = document.getElementById('stock-num');
+                const btn = document.getElementById('btn-comprar');
+                const statusBox = document.getElementById('status-container');
+                const ping = document.getElementById('ping-anim');
 
-        actualizarPantalla();
-    } catch (e) {
-        console.error("Error al leer stock:", e);
-    }
-}
+                if (isNaN(stockReal) || stockReal <= 0) {
+                    display.innerText = "0";
+                    btn.innerText = "AGOTADO POR HOY";
+                    btn.disabled = true;
+                    btn.classList.replace('bg-slate-900', 'bg-slate-200');
+                    btn.classList.replace('text-white', 'text-slate-400');
+                    statusBox.classList.replace('bg-emerald-50', 'bg-red-50');
+                    statusBox.querySelector('span:last-child').classList.replace('text-emerald-700', 'text-red-700');
+                    ping.style.display = 'none';
+                } else {
+                    display.innerText = stockReal;
+                }
+            } catch (e) {
+                console.error("Error cargando inventario:", e);
+            }
+        }
 
-function actualizarPantalla() {
-    const etiq = document.getElementById("status-stock");
-    const controles = document.getElementById("controles-venta");
-    const foto = document.getElementById("foto-producto");
+        function cambiarCant(v) {
+            const input = document.getElementById('cantidad');
+            let nueva = parseInt(input.value) + v;
+            // No deja pedir más de lo que hay en stock real
+            if (nueva >= 1 && nueva <= stockReal) {
+                input.value = nueva;
+            }
+        }
 
-    if (stockReal <= 0) {
-        etiq.innerText = "❌ AGOTADO POR HOY";
-        controles.classList.add("hidden");
-        foto.style.filter = "grayscale(1)";
-    } else {
-        etiq.innerText = `✅ ${stockReal} DISPONIBLES`;
-        controles.classList.remove("hidden");
-        foto.style.filter = "none";
-    }
-}
+        function irAlPago() {
+            const cant = document.getElementById('cantidad').value;
+            // Esta línea te lleva al checkout pasando la cantidad elegida
+            window.location.href = `checkout.html?cant=${cant}`;
+        }
 
-// Cargar al abrir la página
-cargarStock();
-</script>
+        // Cargar stock al iniciar la página
+        cargarStock();
+    </script>
 </body>
 </html>
