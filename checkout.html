@@ -45,30 +45,46 @@
         </form>
     </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const cant = params.get('cant') || 1;
+   <script>
+    const params = new URLSearchParams(window.location.search);
+    const cant = params.get('cant') || 1;
 
-        document.getElementById('pagoForm').onsubmit = function(e) {
-            e.preventDefault();
-            const nom = document.getElementById('nombre').value;
-            const tel = document.getElementById('whatsapp').value;
-            // Como ya no pedimos dirección, enviamos "RECOLECCIÓN EN CASA" al Excel
-            const dir = "RECOLECCIÓN EN CASA";
+    document.getElementById('pagoForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const nom = document.getElementById('nombre').value;
+        const tel = document.getElementById('whatsapp').value;
+        const dir = "RECOLECCIÓN EN CASA";
 
-            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
-            const data = new FormData();
-            data.append("entry.1983084318", nom); 
-            data.append("entry.134371465", tel);  
-            data.append("entry.338561705", dir);  
-            data.append("entry.1018610744", cant); 
+        const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
+        
+        // Usamos URLSearchParams para asegurar compatibilidad total con Google Forms
+        const data = new URLSearchParams();
+        data.append("entry.1983084318", nom); 
+        data.append("entry.134371465", tel);  
+        data.append("entry.338561705", dir);  
+        data.append("entry.1018610744", cant); 
 
-            fetch(formURL, { method: "POST", mode: "no-cors", body: data });
+        // Enviamos al Excel
+        try {
+            await fetch(formURL, { 
+                method: "POST", 
+                mode: "no-cors", 
+                body: data,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            });
+        } catch (error) {
+            console.log("Error al registrar en Excel, procediendo a WhatsApp...");
+        }
 
-            const miTel = "526441880995"; 
-            const msg = `HOLA SKY JUICE, NUEVO PEDIDO:%0A👤:${nom}%0A📱:${tel}%0A📦:${cant} botellas.%0APASARÉ POR ELLAS A LA CASA.%0AAQUÍ TENGO MI COMPROBANTE DE PAGO.`;
+        // WhatsApp
+        const miTel = "526441880995"; 
+        const msg = `HOLA SKY JUICE, NUEVO PEDIDO:%0A👤: ${nom}%0A📱: ${tel}%0A📦: ${cant} botellas.%0APASARÉ POR ELLAS A LA CASA.%0AHe realizado la transferencia.`;
+        
+        // Un pequeño retraso de 300ms solo para asegurar el envío
+        setTimeout(() => {
             window.location.href = `https://wa.me/${miTel}?text=${msg}`;
-        };
-    </script>
+        }, 300);
+    };
+</script>
 </body>
 </html>
