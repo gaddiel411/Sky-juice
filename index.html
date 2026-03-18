@@ -49,67 +49,45 @@
 </div>
 
 <script>
-// TU LINK REAL PUBLICADO
+// LINK DE TU EXCEL (Asegúrate de que sea el que tiene el stock calculado)
 const LINK_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuwJooBcLa4w5CL9ZR2tWBwduiJGsXiPMUkIauf7oaqOCSOws5cNnfUJQKOhQapoR1lM1VEAh6VrkV/pub?gid=506146758&single=true&output=csv";
 
 let stockReal = 0;
-let cantSeleccionada = 1;
 
 async function cargarStock() {
     try {
-        const res = await fetch(LINK_CSV);
+        // El "nocache" es para que Google no guarde la versión vieja y siempre lea el stock nuevo
+        const res = await fetch(LINK_CSV + "&nocache=" + new Date().getTime());
         const data = await res.text();
         const filas = data.split('\n');
         
-        // El CSV viene como "STOCK INICIAL,20,20"
-        // El stock real (B1 - Ventas) está en la tercera posición (índice 2)
+        // Buscamos el stock en la fila 1, columna C (índice 2)
         const columnas = filas[0].split(',');
-        stockReal = parseInt(columnas[2]);
+        stockReal = parseInt(columnas[2]); 
 
-        dibujarUI();
+        actualizarPantalla();
     } catch (e) {
-        document.getElementById("status-stock").innerText = "⚠️ Error de conexión";
-        console.error("No se pudo leer el CSV:", e);
+        console.error("Error al leer stock:", e);
     }
 }
 
-function dibujarUI() {
+function actualizarPantalla() {
     const etiq = document.getElementById("status-stock");
     const controles = document.getElementById("controles-venta");
-    const agotado = document.getElementById("mensaje-agotado");
     const foto = document.getElementById("foto-producto");
 
-    if (isNaN(stockReal) || stockReal <= 0) {
-        etiq.innerText = "❌ AGOTADO";
-        etiq.className = "mb-4 inline-block px-4 py-1 rounded-full text-[10px] font-black bg-red-50 text-red-500";
+    if (stockReal <= 0) {
+        etiq.innerText = "❌ AGOTADO POR HOY";
         controles.classList.add("hidden");
-        agotado.classList.remove("hidden");
-        foto.classList.add("agotado-img");
+        foto.style.filter = "grayscale(1)";
     } else {
         etiq.innerText = `✅ ${stockReal} DISPONIBLES`;
-        etiq.className = "mb-4 inline-block px-4 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-500 tracking-widest";
         controles.classList.remove("hidden");
-        agotado.classList.add("hidden");
-        foto.classList.remove("agotado-img");
+        foto.style.filter = "none";
     }
 }
 
-function cambiarCant(v) {
-    cantSeleccionada += v;
-    if (cantSeleccionada < 1) cantSeleccionada = 1;
-    if (cantSeleccionada > stockReal) {
-        cantSeleccionada = stockReal;
-        alert("¡Híjole! Solo nos quedan " + stockReal + " piezas.");
-    }
-    document.getElementById("cantidad-display").innerText = cantSeleccionada;
-}
-
-function irAPagar() {
-    // Te manda a checkout.html enviando la cantidad
-    window.location.href = "checkout.html?cant=" + cantSeleccionada;
-}
-
-// Iniciar proceso
+// Cargar al abrir la página
 cargarStock();
 </script>
 </body>
