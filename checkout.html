@@ -7,20 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-    </style>
+    <style> @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap'); body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-slate-100 p-4 sm:p-8 text-slate-900">
-
     <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-[3rem] p-8 sm:p-12 border-t-[12px] border-emerald-500 mt-4 text-center">
-        
-        <h1 class="text-4xl font-[900] mb-2 tracking-tighter uppercase italic text-slate-800">CONFIRMAR <span class="text-emerald-500">PEDIDO</span></h1>
+        <h1 class="text-4xl font-[900] mb-2 tracking-tighter uppercase italic text-slate-800 text-center">CONFIRMAR <span class="text-emerald-500">PEDIDO</span></h1>
         <p class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-10 text-center">Sky Juice Obregón</p>
         
         <form id="pagoForm" class="space-y-8 text-left">
-            
             <div class="bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
                 <div class="flex justify-between items-center mb-4">
                     <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Tu Pedido:</span>
@@ -33,120 +27,53 @@
             </div>
 
             <div class="space-y-6">
-                <div>
-                    <label class="text-xs font-black text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Nombre Completo</label>
-                    <input type="text" id="nombre" required placeholder="Ej. Juan Pérez" 
-                           class="w-full p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold placeholder:text-slate-300 transition-all">
-                </div>
-                
-                <div>
-                    <label class="text-xs font-black text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Tu WhatsApp</label>
-                    <div class="flex gap-3">
-                        <select id="codigo-pais" class="bg-slate-50 border-2 border-slate-100 rounded-3xl px-4 text-xl font-bold outline-none focus:border-emerald-500 appearance-none cursor-pointer">
-                            <option value="52">🇲🇽 +52</option>
-                            <option value="1">🇺🇸 +1</option>
-                        </select>
-                        <input type="tel" id="whatsapp" required placeholder="6441234567" 
-                               class="flex-1 p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold placeholder:text-slate-300 transition-all">
-                    </div>
+                <input type="text" id="nombre" required placeholder="Tu Nombre Completo" class="w-full p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold uppercase italic">
+                <div class="flex gap-3">
+                    <select id="codigo-pais" class="bg-slate-50 border-2 border-slate-100 rounded-3xl px-4 text-xl font-bold outline-none focus:border-emerald-500"><option value="52">🇲🇽 +52</option></select>
+                    <input type="tel" id="whatsapp" required placeholder="6441234567" class="flex-1 p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold italic">
                 </div>
             </div>
 
-            <div class="bg-emerald-50 p-6 rounded-[2rem] border-2 border-emerald-100 flex items-center gap-5">
-                <div class="bg-emerald-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-200 flex-shrink-0">📍</div>
-                <div>
-                    <p class="text-[10px] font-black text-emerald-800 uppercase tracking-[0.2em] mb-1">Punto de Entrega:</p>
-                    <p class="text-lg font-black text-slate-800 leading-tight italic text-wrap">Calle Ejemplo #123, Col. Centro</p>
-                </div>
-            </div>
-            
-            <div class="bg-blue-50 p-8 rounded-[2rem] border-2 border-blue-100 text-center">
-                <p class="font-black text-blue-900 mb-4 uppercase text-xs tracking-[0.3em]">Transferencia BBVA</p>
-                <div class="space-y-2">
-                    <p class="text-2xl font-[900] text-blue-900 tracking-tighter">0000 0000 0000 0000 00</p>
-                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Titular: Sky Juice Obregón</p>
-                </div>
-            </div>
-
-            <button type="submit" id="btn-finalizar" 
-                    class="w-full bg-emerald-500 text-white font-[900] py-6 rounded-[2rem] shadow-2xl shadow-emerald-200 uppercase tracking-widest text-lg hover:bg-emerald-600 transition-all active:scale-95 disabled:bg-slate-200">
-                CONFIRMAR PEDIDO
-            </button>
-
-            <p id="error-msg" class="text-red-600 text-xs font-black uppercase mt-4 text-center hidden"></p>
+            <button type="submit" id="btn-finalizar" class="w-full bg-emerald-500 text-white font-[900] py-6 rounded-[2rem] shadow-2xl uppercase tracking-widest text-lg hover:bg-emerald-600 transition-all active:scale-95">CONFIRMAR PEDIDO</button>
+            <p id="error-msg" class="text-red-600 text-xs font-black uppercase text-center hidden"></p>
         </form>
     </div>
 
     <script>
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
-            authDomain: "skyjuice-25d01.firebaseapp.com",
-            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
-            projectId: "skyjuice-25d01"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4", authDomain: "skyjuice-25d01.firebaseapp.com", databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com", projectId: "skyjuice-25d01" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Obtener cantidad de la URL
         const params = new URLSearchParams(window.location.search);
         const cant = parseInt(params.get('cantidad')) || 1;
-        const precio = 40;
-
-        // Gramática inteligente
-        const labelJugo = (cant === 1) ? "jugo" : "jugos";
-        document.getElementById('display-cant').innerText = `${cant} ${labelJugo}`;
-        document.getElementById('display-total').innerText = `$${cant * precio}`;
+        document.getElementById('display-cant').innerText = `${cant} ${cant === 1 ? 'jugo' : 'jugos'}`;
+        document.getElementById('display-total').innerText = `$${cant * 40}`;
 
         document.getElementById('pagoForm').onsubmit = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-finalizar');
-            const errorDisplay = document.getElementById('error-msg');
             const nom = document.getElementById('nombre').value;
-            const codPais = document.getElementById('codigo-pais').value;
-            const numTel = document.getElementById('whatsapp').value.replace(/\D/g,''); 
-            const telCompleto = `+${codPais} ${numTel}`;
-            const dir = "RECOLECCIÓN EN PUNTO";
-
-            btn.disabled = true;
-            btn.innerText = "VERIFICANDO...";
-
-            // 1. TRANSACCIÓN ATÓMICA FIREBASE
-            const stockRef = db.ref('stock_actual');
+            const tel = `+${document.getElementById('codigo-pais').value} ${document.getElementById('whatsapp').value}`;
             
-            stockRef.transaction((currentStock) => {
-                if (currentStock === null) return 0;
-                if (currentStock >= cant) {
-                    return currentStock - cant;
-                } else {
-                    return; 
-                }
+            btn.disabled = true; btn.innerText = "PROCESANDO...";
+
+            const stockRef = db.ref('stock_actual');
+            stockRef.transaction((current) => {
+                if (current >= cant) return current - cant;
+                return;
             }, (error, committed, snapshot) => {
                 if (committed) {
-                    // 2. REGISTRO EN GOOGLE SHEETS (Vía Form)
-                    const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
+                    // REGISTRO EN FIREBASE (TIEMPO REAL)
+                    db.ref('pedidos').push({ nombre: nom, whatsapp: tel, entrega: 'RECOLECCIÓN', cantidad: cant, fecha: new Date().toLocaleString() });
+                    // REGISTRO EN GOOGLE SHEETS (RESPALDO)
                     const data = new URLSearchParams();
-                    
-                    // USANDO TUS IDS REALES REVISADOS:
-                    data.append("entry.796663698", nom);
-                    data.append("entry.504990176", telCompleto);
-                    data.append("entry.1399542669", dir);
-                    data.append("entry.1018610744", cant); // <--- ID CORRECTO DE CANTIDAD
-                    
-                    fetch(formURL, { method: "POST", mode: "no-cors", body: data });
+                    data.append("entry.796663698", nom); data.append("entry.504990176", tel); data.append("entry.1399542669", "PUNTO FIJO"); data.append("entry.1018610744", cant);
+                    fetch("https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse", { method: "POST", mode: "no-cors", body: data });
 
-                    // 3. WHATSAPP
-                    const miTel = "526441880995"; 
-                    const productoTexto = (cant === 1) ? "jugo" : "jugos";
-                    
-                    const msg = `¡HOLA SKY JUICE!%0A👤 *Nombre:* ${nom}%0A📱 *WhatsApp:* ${telCompleto}%0A📦 *Pedido:* ${cant} ${productoTexto} de caña.%0A📍 *Entrega:* Pasaré al punto fijo.%0A---%0AYA REALICÉ MI PAGO. AQUÍ ESTÁ MI COMPROBANTE:`;
-                    
-                    window.location.href = `https://wa.me/${miTel}?text=${msg}`;
+                    window.location.href = `https://wa.me/526441880995?text=¡HOLA! Soy ${nom}, pedí ${cant} jugos.`;
                 } else {
-                    btn.disabled = false;
-                    btn.innerText = "CONFIRMAR PEDIDO";
-                    errorDisplay.innerText = `¡ERROR! Solo quedan ${snapshot.val()} disponibles.`;
-                    errorDisplay.classList.remove('hidden');
+                    btn.disabled = false; btn.innerText = "SIN STOCK";
+                    alert("¡Lo sentimos! Solo quedan " + snapshot.val() + " jugos.");
                 }
             });
         };
