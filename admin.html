@@ -3,69 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Juice Admin | Firebase</title>
+    <title>Panel de Control | Sky Juice Obregón</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        #panel-ventas { display: none; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans">
+<body class="bg-slate-100 font-sans text-slate-900">
 
-    <div class="max-w-md mx-auto p-6 text-center">
-        <h1 class="text-3xl font-black italic mb-8 uppercase text-slate-800">Sky <span class="text-emerald-500">Admin</span></h1>
+    <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full border-t-8 border-teal-600 text-center">
+            <h2 class="text-2xl font-black mb-6 uppercase tracking-tighter text-slate-800">Sky Admin</h2>
+            <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-4 border-2 rounded-xl mb-4 text-center font-bold outline-none focus:border-teal-500 transition-all">
+            <button onclick="verificar()" class="w-full bg-teal-600 text-white py-4 rounded-xl font-bold hover:bg-teal-700 shadow-lg transition-all active:scale-95">ENTRAR AL PANEL</button>
+            <p id="errorMsg" class="text-red-500 text-xs mt-4 font-bold hidden">❌ Contraseña incorrecta</p>
+        </div>
+    </div>
 
-        <div class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-100 mb-8">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Botellas en Inventario</p>
-            <div id="stock-num" class="text-9xl font-black text-slate-800 tracking-tighter mb-8">--</div>
-            
-            <div class="flex justify-center gap-4 mb-8">
-                <button onclick="cambiarStock(-1)" class="w-20 h-20 bg-slate-100 rounded-3xl text-3xl font-black hover:bg-red-50 hover:text-red-500 transition-all">-1</button>
-                <button onclick="cambiarStock(1)" class="w-20 h-20 bg-slate-100 rounded-3xl text-3xl font-black hover:bg-emerald-50 hover:text-emerald-500 transition-all">+1</button>
-            </div>
-
-            <div class="border-t pt-6">
-                <input type="number" id="nuevo-valor" placeholder="Cant." class="w-24 p-3 text-center border rounded-xl font-bold bg-slate-50 outline-none focus:border-emerald-500 mb-2">
-                <button onclick="fijarStock()" class="block w-full text-[10px] font-black uppercase text-slate-400 hover:text-slate-800 transition-all">Fijar cantidad exacta</button>
+    <div id="panel-ventas" class="p-4 md:p-8 max-w-6xl mx-auto">
+        
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h1 class="text-3xl font-black text-slate-800 tracking-tighter">SKY JUICE <span class="text-teal-600 font-light underline">OBREGÓN</span></h1>
+            <div class="flex gap-2">
+                <button onclick="cargarDatos()" class="bg-white border-2 border-slate-200 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all">🔄 ACTUALIZAR PEDIDOS</button>
+                <button onclick="exportarExcel()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition-all">📊 DESCARGAR EXCEL</button>
             </div>
         </div>
 
-        <p class="text-[9px] text-slate-300 font-bold uppercase tracking-widest">Conectado a SkyJuice-25d01</p>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
+            <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Control de Stock Disponible</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-2">1. Definir Total (Reset)</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="input-set" placeholder="Cantidad" class="w-full p-2 text-center font-black border-2 rounded-lg outline-none focus:border-blue-500">
+                        <button onclick="gestionarStock('set')" class="bg-blue-600 text-white px-3 py-2 rounded-lg font-bold text-[10px] hover:bg-blue-700">FIJAR</button>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+                    <label class="text-[10px] font-bold text-green-700 uppercase block mb-2">2. Agregar Jugos</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="input-add" placeholder="+" class="w-full p-2 text-center font-black border-2 border-green-200 rounded-lg outline-none focus:border-green-500">
+                        <button onclick="gestionarStock('add')" class="bg-green-600 text-white px-3 py-2 rounded-lg font-bold text-[10px] hover:bg-green-700">SUMAR</button>
+                    </div>
+                </div>
+
+                <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                    <label class="text-[10px] font-bold text-red-700 uppercase block mb-2">3. Retirar Jugos</label>
+                    <div class="flex gap-2">
+                        <input type="number" id="input-sub" placeholder="-" class="w-full p-2 text-center font-black border-2 border-red-200 rounded-lg outline-none focus:border-red-500">
+                        <button onclick="gestionarStock('sub')" class="bg-red-600 text-white px-3 py-2 rounded-lg font-bold text-[10px] hover:bg-red-700">RESTAR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-slate-100 flex flex-col items-center">
+                <span id="stock-actual" class="text-7xl font-black text-slate-800 leading-none">--</span>
+                <span class="text-teal-600 font-black uppercase text-xs mt-2 tracking-widest">Botellas en existencia</span>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table id="tabla-pedidos" class="w-full text-left">
+                    <thead class="bg-slate-50 text-[10px] text-slate-400 uppercase font-black tracking-widest border-b">
+                        <tr>
+                            <th class="p-4 text-center">Fecha/Hora</th>
+                            <th class="p-4">Cliente</th>
+                            <th class="p-4">WhatsApp</th>
+                            <th class="p-4">Entrega</th>
+                            <th class="p-4 text-center">Cant.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenido-tabla" class="text-sm font-medium divide-y divide-slate-100">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Tus datos reales de Firebase
+        // CONFIGURACIÓN CLAVE (YA TIENE TUS DATOS)
+        const MI_PASSWORD = "123"; 
+        const URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuwJooBcLa4w5CL9ZR2tWBwduiJGsXiPMUkIauf7oaqOCSOws5cNnfUJQKOhQapoR1lM1VEAh6VrkV/pub?output=csv";
+
         const firebaseConfig = {
             apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
             authDomain: "skyjuice-25d01.firebaseapp.com",
-            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com", // Agregué esto manualmente
+            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
             projectId: "skyjuice-25d01",
             storageBucket: "skyjuice-25d01.firebasestorage.app",
             messagingSenderId: "698344960386",
             appId: "1:698344960386:web:17d40a2eed4393ad311f9b"
         };
 
-        // Inicializar
+        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const stockRef = db.ref('stock_actual');
 
-        // Leer stock en tiempo real
-        stockRef.on('value', (snapshot) => {
-            const stock = snapshot.val();
-            document.getElementById('stock-num').innerText = (stock !== null) ? stock : 0;
+        // Escuchar Stock en tiempo real
+        stockRef.on('value', (snap) => {
+            document.getElementById('stock-actual').innerText = snap.val() || 0;
         });
 
-        // Sumar o Restar
-        function cambiarStock(n) {
-            stockRef.transaction((current) => (current || 0) + n);
+        // LÓGICA DE INVENTARIO CON FIREBASE
+        function gestionarStock(accion) {
+            let inputId = (accion === 'set') ? 'input-set' : (accion === 'add') ? 'input-add' : 'input-sub';
+            let valorInput = parseInt(document.getElementById(inputId).value);
+
+            if (isNaN(valorInput)) return;
+
+            if (accion === 'set') {
+                stockRef.set(valorInput);
+            } else if (accion === 'add') {
+                stockRef.transaction(c => (c || 0) + valorInput);
+            } else if (accion === 'sub') {
+                stockRef.transaction(c => Math.max(0, (c || 0) - valorInput));
+            }
+            document.getElementById(inputId).value = ""; 
         }
 
-        // Escribir un número directo
-        function fijarStock() {
-            const val = parseInt(document.getElementById('nuevo-valor').value);
-            if(!isNaN(val)) {
-                stockRef.set(val);
-                document.getElementById('nuevo-valor').value = "";
+        function verificar() {
+            if(document.getElementById('passInput').value === MI_PASSWORD) {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('panel-ventas').style.display = 'block';
+                cargarDatos();
+            } else {
+                document.getElementById('errorMsg').classList.remove('hidden');
+                document.getElementById('passInput').value = "";
             }
+        }
+
+        async function cargarDatos() {
+            try {
+                const response = await fetch(URL_CSV + "&nocache=" + new Date().getTime());
+                const csvData = await response.text();
+                const filas = csvData.split(/\r?\n/).slice(1);
+                let html = "";
+
+                filas.forEach(f => {
+                    const c = f.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    if (c.length >= 4) {
+                        html += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-4 text-[10px] text-slate-400 font-mono text-center">${c[0].replace(/"/g, '')}</td>
+                            <td class="p-4 font-bold text-slate-800 uppercase">${c[1].replace(/"/g, '')}</td>
+                            <td class="p-4 font-bold text-teal-600"><a href="https://wa.me/52${c[2].replace(/\D/g,'')}" target="_blank">📱 WhatsApp</a></td>
+                            <td class="p-4 text-xs italic text-slate-500">${c[3].replace(/"/g, '')}</td>
+                            <td class="p-4 text-center font-black text-slate-900">${c[4] ? c[4].replace(/"/g, '') : '1'}</td>
+                        </tr>`;
+                    }
+                });
+                document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-10 text-center font-bold text-slate-300 italic tracking-widest uppercase">No hay pedidos registrados aún</td></tr>';
+            } catch (e) {
+                console.error("Error al conectar con Google Sheets:", e);
+            }
+        }
+
+        function exportarExcel() {
+            const lib = XLSX.utils.table_to_book(document.getElementById("tabla-pedidos"));
+            XLSX.writeFile(lib, "Ventas_SkyJuice_Obregon.xlsx");
         }
     </script>
 </body>
