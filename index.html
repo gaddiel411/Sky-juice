@@ -3,41 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Juice | Obregón</title>
+    <title>Sky Juice | Jugo de Caña Natural</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900">
 
     <div class="max-w-md mx-auto min-h-screen flex flex-col p-6">
-        <header class="text-center py-8">
-            <h1 class="text-4xl font-black italic tracking-tighter text-slate-800">SKY <span class="text-emerald-500">JUICE</span></h1>
+        <header class="text-center py-10">
+            <h1 class="text-4xl font-black italic tracking-tighter">SKY <span class="text-emerald-500">JUICE</span></h1>
             <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Natural & Fresh • Cd. Obregón</p>
         </header>
 
-        <div class="bg-white rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden border border-slate-100 relative">
+        <div class="bg-white rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden border border-slate-100">
             <div class="p-2">
-                <img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1000&auto=format&fit=crop" 
-                     alt="Sky Juice Bottle" 
-                     class="w-full h-80 object-cover rounded-[2.5rem]">
+                <img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1000&auto=format&fit=crop" class="w-full h-72 object-cover rounded-[2.5rem]">
             </div>
             
             <div class="p-8">
-                <div class="flex justify-between items-start mb-4">
+                <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-2xl font-black text-slate-800 uppercase">Jugo de Caña</h2>
-                        <p class="text-sm text-slate-400 font-bold">Botella 500ml</p>
+                        <h2 class="text-2xl font-black uppercase">Jugo de Caña</h2>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Botella 500ml</p>
                     </div>
                     <span class="text-2xl font-black text-emerald-500">$40</span>
                 </div>
 
-                <div id="status-container" class="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full mb-8">
-                    <span id="ping-anim" class="relative flex h-2 w-2">
+                <div id="status-badge" class="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full mb-8">
+                    <span id="ping" class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
@@ -46,86 +44,57 @@
                     </span>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between bg-slate-50 p-2 rounded-2xl border border-slate-100">
-                        <span class="text-[10px] font-black uppercase text-slate-400 px-4">Cantidad</span>
-                        <div class="flex items-center gap-4">
-                            <button onclick="cambiarCant(-1)" class="w-10 h-10 flex items-center justify-center font-bold text-xl text-slate-400 hover:text-slate-900">-</button>
-                            <input type="number" id="cantidad" value="1" readonly class="w-8 bg-transparent text-center font-black text-lg outline-none">
-                            <button onclick="cambiarCant(1)" class="w-10 h-10 flex items-center justify-center font-bold text-xl text-slate-400 hover:text-slate-900">+</button>
-                        </div>
-                    </div>
-
-                    <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-black py-5 rounded-[1.5rem] shadow-xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest text-sm disabled:bg-slate-200 disabled:text-slate-400">
-                        Ordenar Ahora
-                    </button>
-                </div>
+                <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest text-sm disabled:bg-slate-200 disabled:text-slate-400">
+                    Ordenar Ahora
+                </button>
             </div>
         </div>
 
-        <footer class="mt-auto py-8 text-center text-slate-300">
+        <footer class="mt-auto py-10 text-center text-slate-300">
             <p class="text-[9px] font-bold uppercase tracking-widest">© 2026 Sky Juice Obregón</p>
         </footer>
     </div>
 
     <script>
-        // CONFIGURACIÓN DE TU FIREBASE (Basada en tu captura de pantalla)
         const firebaseConfig = {
             apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
             authDomain: "skyjuice-25d01.firebaseapp.com",
             databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
             projectId: "skyjuice-25d01",
             storageBucket: "skyjuice-25d01.firebasestorage.app",
+            messagingSenderId: "698344960386",
+            appId: "1:698344960386:web:17d40a2eed4393ad311f9b"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let stockActual = 0;
 
-        // ESCUCHAR CAMBIOS EN TIEMPO REAL
+        // Escuchar el stock en tiempo real
         db.ref('stock_actual').on('value', (snapshot) => {
-            stockActual = snapshot.val() || 0;
-            actualizarInterfaz(stockActual);
-        });
-
-        function actualizarInterfaz(stock) {
-            const display = document.getElementById('stock-num');
+            const stock = snapshot.val() || 0;
+            document.getElementById('stock-num').innerText = stock;
+            
             const btn = document.getElementById('btn-comprar');
-            const statusBox = document.getElementById('status-container');
-            const ping = document.getElementById('ping-anim');
-            const cantInput = document.getElementById('cantidad');
-
-            display.innerText = stock;
+            const ping = document.getElementById('ping');
+            const badge = document.getElementById('status-badge');
 
             if (stock <= 0) {
-                btn.innerText = "AGOTADO POR HOY";
+                btn.innerText = "AGOTADO";
                 btn.disabled = true;
-                statusBox.classList.replace('bg-emerald-50', 'bg-red-50');
-                statusBox.querySelector('span:last-child').classList.replace('text-emerald-700', 'text-red-700');
                 ping.style.display = 'none';
-                cantInput.value = 0;
+                badge.classList.replace('bg-emerald-50', 'bg-red-50');
+                badge.querySelector('span:last-child').classList.replace('text-emerald-700', 'text-red-700');
             } else {
                 btn.innerText = "ORDENAR AHORA";
                 btn.disabled = false;
-                statusBox.classList.replace('bg-red-50', 'bg-emerald-50');
-                statusBox.querySelector('span:last-child').classList.replace('text-red-700', 'text-emerald-700');
                 ping.style.display = 'flex';
-                if(parseInt(cantInput.value) === 0) cantInput.value = 1;
+                badge.classList.replace('bg-red-50', 'bg-emerald-50');
+                badge.querySelector('span:last-child').classList.replace('text-red-700', 'text-emerald-700');
             }
-        }
-
-        function cambiarCant(v) {
-            const input = document.getElementById('cantidad');
-            let nueva = parseInt(input.value) + v;
-            if (nueva >= 1 && nueva <= stockActual) {
-                input.value = nueva;
-            }
-        }
+        });
 
         function irAlPago() {
-            const cant = document.getElementById('cantidad').value;
-            window.location.href = `checkout.html?cant=${cant}`;
+            window.location.href = "checkout.html";
         }
     </script>
 </body>
