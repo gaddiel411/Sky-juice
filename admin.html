@@ -3,53 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Juice Admin | Realtime</title>
+    <title>Sky Juice Admin | Firebase</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 font-sans">
+
     <div class="max-w-md mx-auto p-6 text-center">
         <h1 class="text-3xl font-black italic mb-8 uppercase text-slate-800">Sky <span class="text-emerald-500">Admin</span></h1>
 
-        <div class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-100">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Stock en Tiempo Real</p>
-            <div id="stock-num" class="text-9xl font-black text-slate-800 mb-8">--</div>
+        <div class="bg-white p-10 rounded-[3rem] shadow-xl border border-slate-100 mb-8">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Botellas en Inventario</p>
+            <div id="stock-num" class="text-9xl font-black text-slate-800 tracking-tighter mb-8">--</div>
             
-            <div class="flex justify-center gap-4">
-                <button onclick="cambiarStock(-1)" class="w-20 h-20 bg-slate-100 rounded-3xl text-3xl font-black hover:bg-red-50 hover:text-red-500 transition-all">-</button>
-                <button onclick="cambiarStock(1)" class="w-20 h-20 bg-slate-100 rounded-3xl text-3xl font-black hover:bg-emerald-50 hover:text-emerald-500 transition-all">+</button>
+            <div class="flex justify-center gap-4 mb-8">
+                <button onclick="cambiarStock(-1)" class="w-20 h-20 bg-slate-100 rounded-3xl text-3xl font-black hover:bg-red-50 hover:text-red-500 transition-all">-1</button>
+                <button onclick="cambiarStock(1)" class="w-20 h-20 bg-slate-100 rounded-3xl text-3xl font-black hover:bg-emerald-50 hover:text-emerald-500 transition-all">+1</button>
             </div>
-            
-            <input type="number" id="set-valor" placeholder="20" class="mt-8 w-20 p-2 text-center border rounded-lg font-bold">
-            <button onclick="fijarStock()" class="block w-full mt-2 text-[10px] font-black uppercase text-slate-400">Fijar Cantidad</button>
+
+            <div class="border-t pt-6">
+                <input type="number" id="nuevo-valor" placeholder="Cant." class="w-24 p-3 text-center border rounded-xl font-bold bg-slate-50 outline-none focus:border-emerald-500 mb-2">
+                <button onclick="fijarStock()" class="block w-full text-[10px] font-black uppercase text-slate-400 hover:text-slate-800 transition-all">Fijar cantidad exacta</button>
+            </div>
         </div>
+
+        <p class="text-[9px] text-slate-300 font-bold uppercase tracking-widest">Conectado a SkyJuice-25d01</p>
     </div>
 
     <script>
+        // Tus datos reales de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
             authDomain: "skyjuice-25d01.firebaseapp.com",
-            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
+            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com", // Agregué esto manualmente
             projectId: "skyjuice-25d01",
             storageBucket: "skyjuice-25d01.firebasestorage.app",
+            messagingSenderId: "698344960386",
+            appId: "1:698344960386:web:17d40a2eed4393ad311f9b"
         };
 
+        // Inicializar
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const stockRef = db.ref('stock_actual');
 
-        stockRef.on('value', (snap) => {
-            document.getElementById('stock-num').innerText = snap.val() || 0;
+        // Leer stock en tiempo real
+        stockRef.on('value', (snapshot) => {
+            const stock = snapshot.val();
+            document.getElementById('stock-num').innerText = (stock !== null) ? stock : 0;
         });
 
+        // Sumar o Restar
         function cambiarStock(n) {
-            stockRef.transaction(c => (c || 0) + n);
+            stockRef.transaction((current) => (current || 0) + n);
         }
 
+        // Escribir un número directo
         function fijarStock() {
-            const val = parseInt(document.getElementById('set-valor').value);
-            if(!isNaN(val)) stockRef.set(val);
+            const val = parseInt(document.getElementById('nuevo-valor').value);
+            if(!isNaN(val)) {
+                stockRef.set(val);
+                document.getElementById('nuevo-valor').value = "";
+            }
         }
     </script>
 </body>
