@@ -5,74 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Finalizar Pedido | Sky Juice</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body class="bg-gray-100 p-4 font-sans">
-    <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-[2rem] p-8 border-t-8 border-emerald-500 mt-6">
-        <h2 class="text-2xl font-black text-center mb-6 uppercase tracking-tight text-gray-800">Confirmar Pedido</h2>
-        
-        <form id="pagoForm" class="space-y-5">
-            <div>
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tu Nombre</label>
-                <input type="text" id="nombre" required placeholder="Ej. Juan Pérez" class="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-emerald-500 bg-gray-50">
-            </div>
-            <div>
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tu WhatsApp</label>
-                <input type="tel" id="whatsapp" required pattern="[0-9]{10}" placeholder="6441234567" class="w-full p-4 border-2 border-gray-100 rounded-2xl outline-none focus:border-emerald-500 bg-gray-50">
-            </div>
+<body class="bg-slate-100 p-4 sm:p-8 text-slate-900">
 
-            <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
-                <p class="text-[10px] font-black text-emerald-800 uppercase mb-1 tracking-widest">Punto de Entrega:</p>
-                <p class="text-sm font-bold text-gray-700">📍 Calle Ejemplo #123, Col. Centro, Cd. Obregón</p>
-            </div>
+    <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-[3rem] p-8 sm:p-12 border-t-[12px] border-emerald-500 mt-4 text-center">
+        
+        <h1 class="text-4xl font-[900] mb-2 tracking-tighter uppercase italic text-slate-800">CONFIRMAR <span class="text-emerald-500">PEDIDO</span></h1>
+        <p class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-10 text-center">Sky Juice Obregón</p>
+        
+        <form id="pagoForm" class="space-y-8 text-left">
             
-            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-                <p class="font-black text-blue-900 mb-3 uppercase text-xs tracking-widest">Paso 1: Pago por Transferencia</p>
-                <div class="text-sm space-y-1 text-blue-800">
-                    <p><strong>Banco:</strong> BBVA</p>
-                    <p><strong>CLABE:</strong> 0000 0000 0000 0000 00</p>
-                    <p><strong>Titular:</strong> Sky Juice Obregón</p>
+            <div class="bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Tu Pedido:</span>
+                    <span id="display-cant" class="font-[900] text-emerald-600 text-3xl italic">--</span>
+                </div>
+                <div class="flex justify-between items-center border-t-2 border-dashed border-slate-200 pt-4">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Total a Pagar:</span>
+                    <span id="display-total" class="font-[900] text-slate-900 text-3xl">$0</span>
                 </div>
             </div>
 
-            <button type="submit" class="w-full bg-emerald-500 text-white font-black py-5 rounded-2xl shadow-lg shadow-emerald-100 uppercase tracking-widest hover:bg-emerald-600 transition-all">
-                Confirmar y enviar comprobante
+            <div class="space-y-6">
+                <div>
+                    <label class="text-xs font-black text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Nombre Completo</label>
+                    <input type="text" id="nombre" required placeholder="Ej. Juan Pérez" 
+                           class="w-full p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold placeholder:text-slate-300 transition-all">
+                </div>
+                
+                <div>
+                    <label class="text-xs font-black text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Tu WhatsApp</label>
+                    <div class="flex gap-3">
+                        <select id="codigo-pais" class="bg-slate-50 border-2 border-slate-100 rounded-3xl px-4 text-xl font-bold outline-none focus:border-emerald-500 appearance-none cursor-pointer">
+                            <option value="52">🇲🇽 +52</option>
+                            <option value="1">🇺🇸 +1</option>
+                        </select>
+                        <input type="tel" id="whatsapp" required placeholder="6441234567" 
+                               class="flex-1 p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold placeholder:text-slate-300 transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-emerald-50 p-6 rounded-[2rem] border-2 border-emerald-100 flex items-center gap-5">
+                <div class="bg-emerald-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-emerald-200 flex-shrink-0">📍</div>
+                <div>
+                    <p class="text-[10px] font-black text-emerald-800 uppercase tracking-[0.2em] mb-1">Recoger en Punto de Entrega:</p>
+                    <p class="text-lg font-black text-slate-800 leading-tight italic">Calle Ejemplo #123, Col. Centro</p>
+                </div>
+            </div>
+            
+            <div class="bg-blue-50 p-8 rounded-[2rem] border-2 border-blue-100 text-center">
+                <p class="font-black text-blue-900 mb-4 uppercase text-xs tracking-[0.3em]">Paso 1: Pago por Transferencia</p>
+                <div class="space-y-2">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Banco: <span class="text-blue-900 font-black">BBVA</span></p>
+                    <p class="text-2xl font-[900] text-blue-900 tracking-tighter">0000 0000 0000 0000 00</p>
+                    <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Titular: Sky Juice Obregón</p>
+                </div>
+            </div>
+
+            <button type="submit" id="btn-finalizar" 
+                    class="w-full bg-emerald-500 text-white font-[900] py-6 rounded-[2rem] shadow-2xl shadow-emerald-200 uppercase tracking-widest text-lg hover:bg-emerald-600 transition-all active:scale-95 disabled:bg-slate-200">
+                CONFIRMAR PEDIDO
             </button>
-            <p class="text-[10px] text-center text-gray-400 font-bold uppercase mt-4">Al dar clic se abrirá tu WhatsApp para enviar el comprobante</p>
+
+            <p id="error-msg" class="text-red-600 text-xs font-black uppercase mt-4 text-center hidden"></p>
+            <p class="text-[10px] text-center text-slate-400 font-bold uppercase mt-6 leading-relaxed tracking-widest px-4">
+                Al confirmar, apartamos tu stock y te enviamos a WhatsApp para el comprobante de pago.
+            </p>
         </form>
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
+            authDomain: "skyjuice-25d01.firebaseapp.com",
+            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
+            projectId: "skyjuice-25d01"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const params = new URLSearchParams(window.location.search);
-        const cant = params.get('cant') || 1;
+        const cant = parseInt(params.get('cantidad')) || 1;
+        const precio = 40;
+
+        const labelJugo = (cant === 1) ? "jugo" : "jugos";
+        document.getElementById('display-cant').innerText = `${cant} ${labelJugo}`;
+        document.getElementById('display-total').innerText = `$${cant * precio}`;
 
         document.getElementById('pagoForm').onsubmit = async function(e) {
             e.preventDefault();
+            const btn = document.getElementById('btn-finalizar');
+            const errorDisplay = document.getElementById('error-msg');
             const nom = document.getElementById('nombre').value;
-            const tel = document.getElementById('whatsapp').value;
-            
-            // Texto automático para que el Excel no quede vacío
+            const codPais = document.getElementById('codigo-pais').value;
+            const numTel = document.getElementById('whatsapp').value.replace(/\D/g,''); 
+            const telCompleto = `+${codPais} ${numTel}`;
             const dir = "RECOLECCIÓN EN PUNTO";
 
-            // URL DE TU FORMULARIO (La misma de tu link)
-            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
-            
-            const data = new URLSearchParams();
-            // USANDO TUS IDs REALES:
-            data.append("entry.796663698", nom);   // ID Nombre
-            data.append("entry.504990176", tel);   // ID WhatsApp
-            data.append("entry.1399542669", dir);  // ID Dirección (Auto)
-            data.append("entry.1018610744", cant); // ID Cantidad (Probable)
+            btn.disabled = true;
+            btn.innerText = "VERIFICANDO...";
 
-            // 1. Enviar al Excel silenciosamente
-            fetch(formURL, { method: "POST", mode: "no-cors", body: data });
-
-            // 2. Enviar a tu WhatsApp
-            const miTel = "526441880995"; 
-            const msg = `¡HOLA SKY JUICE!%0A👤 *Nombre:* ${nom}%0A📱 *WhatsApp:* ${tel}%0A📦 *Pedido:* ${cant} botellas.%0A📍 *Entrega:* Pasaré al punto fijo.%0A---%0AYA REALICÉ MI PAGO. AQUÍ ESTÁ MI COMPROBANTE:`;
+            const stockRef = db.ref('stock_actual');
             
-            setTimeout(() => {
-                window.location.href = `https://wa.me/${miTel}?text=${msg}`;
-            }, 500);
+            stockRef.transaction((currentStock) => {
+                if (currentStock === null) return 0;
+                if (currentStock >= cant) {
+                    return currentStock - cant;
+                } else {
+                    return; 
+                }
+            }, (error, committed, snapshot) => {
+                if (committed) {
+                    const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse";
+                    const data = new URLSearchParams();
+                    data.append("entry.796663698", nom);
+                    data.append("entry.504990176", telCompleto);
+                    data.append("entry.1399542669", dir);
+                    data.append("entry.1018610744", cant);
+                    
+                    fetch(formURL, { method: "POST", mode: "no-cors", body: data });
+
+                    const miTel = "526441880995"; 
+                    const productoTexto = (cant === 1) ? "jugo" : "jugos";
+                    
+                    const msg = `¡HOLA SKY JUICE!%0A👤 *Nombre:* ${nom}%0A📱 *WhatsApp:* ${telCompleto}%0A📦 *Pedido:* ${cant} ${productoTexto} de caña.%0A📍 *Entrega:* Pasaré al punto fijo.%0A---%0AYA REALICÉ MI PAGO. AQUÍ ESTÁ MI COMPROBANTE:`;
+                    
+                    window.location.href = `https://wa.me/${miTel}?text=${msg}`;
+                } else {
+                    btn.disabled = false;
+                    btn.innerText = "CONFIRMAR PEDIDO";
+                    errorDisplay.innerText = `¡ERROR! Quedan: ${snapshot.val()}. Alguien compró antes.`;
+                    errorDisplay.classList.remove('hidden');
+                }
+            });
         };
     </script>
 </body>
