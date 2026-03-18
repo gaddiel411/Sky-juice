@@ -10,13 +10,14 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
 
     <div class="max-w-md mx-auto min-h-screen flex flex-col p-6">
         <header class="text-center py-10">
-            <h1 class="text-4xl font-black italic tracking-tighter">SKY <span class="text-emerald-500">JUICE</span></h1>
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase">SKY <span class="text-emerald-500">JUICE</span></h1>
             <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Natural & Fresh • Cd. Obregón</p>
         </header>
 
@@ -28,13 +29,13 @@
             <div class="p-8">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-2xl font-black uppercase">Jugo de Caña</h2>
+                        <h2 class="text-2xl font-black uppercase text-slate-800">Jugo de Caña</h2>
                         <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Botella 500ml</p>
                     </div>
                     <span class="text-2xl font-black text-emerald-500">$40</span>
                 </div>
 
-                <div id="status-badge" class="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full mb-8">
+                <div id="status-badge" class="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full mb-6">
                     <span id="ping" class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -44,6 +45,15 @@
                     </span>
                 </div>
 
+                <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl mb-6 border border-slate-100">
+                    <span class="text-[10px] font-black uppercase text-slate-400 px-2">¿Cuántas quieres?</span>
+                    <div class="flex items-center gap-6">
+                        <button onclick="cambiarCantCliente(-1)" class="w-8 h-8 flex items-center justify-center font-black text-2xl text-slate-300 hover:text-emerald-500 transition-colors">-</button>
+                        <input type="number" id="cant-cliente" value="1" readonly class="w-10 bg-transparent text-center font-black text-xl text-slate-700 outline-none">
+                        <button onclick="cambiarCantCliente(1)" class="w-8 h-8 flex items-center justify-center font-black text-2xl text-slate-300 hover:text-emerald-500 transition-colors">+</button>
+                    </div>
+                </div>
+
                 <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest text-sm disabled:bg-slate-200 disabled:text-slate-400">
                     Ordenar Ahora
                 </button>
@@ -51,11 +61,12 @@
         </div>
 
         <footer class="mt-auto py-10 text-center text-slate-300">
-            <p class="text-[9px] font-bold uppercase tracking-widest">© 2026 Sky Juice Obregón</p>
+            <p class="text-[9px] font-bold uppercase tracking-[0.3em]">© 2026 Sky Juice Obregón</p>
         </footer>
     </div>
 
     <script>
+        // Configuración de Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
             authDomain: "skyjuice-25d01.firebaseapp.com",
@@ -68,19 +79,24 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        let stockGlobal = 0;
 
-        // Escuchar el stock en tiempo real
+        // Escuchar cambios en vivo
         db.ref('stock_actual').on('value', (snapshot) => {
-            const stock = snapshot.val() || 0;
-            document.getElementById('stock-num').innerText = stock;
-            
+            stockGlobal = snapshot.val() || 0;
+            const display = document.getElementById('stock-num');
             const btn = document.getElementById('btn-comprar');
+            const inputCant = document.getElementById('cant-cliente');
             const ping = document.getElementById('ping');
             const badge = document.getElementById('status-badge');
 
-            if (stock <= 0) {
+            display.innerText = stockGlobal;
+
+            // Lógica si se acaba el jugo
+            if (stockGlobal <= 0) {
                 btn.innerText = "AGOTADO";
                 btn.disabled = true;
+                inputCant.value = 0;
                 ping.style.display = 'none';
                 badge.classList.replace('bg-emerald-50', 'bg-red-50');
                 badge.querySelector('span:last-child').classList.replace('text-emerald-700', 'text-red-700');
@@ -90,11 +106,24 @@
                 ping.style.display = 'flex';
                 badge.classList.replace('bg-red-50', 'bg-emerald-50');
                 badge.querySelector('span:last-child').classList.replace('text-red-700', 'text-emerald-700');
+                if(parseInt(inputCant.value) === 0) inputCant.value = 1;
             }
         });
 
+        // Función para subir/bajar cantidad deseada
+        function cambiarCantCliente(n) {
+            const input = document.getElementById('cant-cliente');
+            let nuevaCant = parseInt(input.value) + n;
+            
+            if (nuevaCant >= 1 && nuevaCant <= stockGlobal) {
+                input.value = nuevaCant;
+            }
+        }
+
         function irAlPago() {
-            window.location.href = "checkout.html";
+            const cantidad = document.getElementById('cant-cliente').value;
+            // Mandamos la cantidad seleccionada a la siguiente página
+            window.location.href = `checkout.html?cantidad=${cantidad}`;
         }
     </script>
 </body>
