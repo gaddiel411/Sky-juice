@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sky Juice | Obregón</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
@@ -54,7 +56,7 @@
                         </div>
                     </div>
 
-                    <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-black py-5 rounded-[1.5rem] shadow-xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest text-sm">
+                    <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-black py-5 rounded-[1.5rem] shadow-xl hover:bg-black transition-all active:scale-95 uppercase tracking-widest text-sm disabled:bg-slate-200 disabled:text-slate-400">
                         Ordenar Ahora
                     </button>
                 </div>
@@ -67,61 +69,64 @@
     </div>
 
     <script>
-        // LINK DE EXPORTACIÓN DIRECTA (SIN RETRASO)
-        const URL_INVENTARIO = "https://docs.google.com/spreadsheets/d/1vSuwJooBcLa4w5CL9ZR2tWBwduiJGsXiPMUkIauf7oaqOCSOws5cNnfUJQKOhQapoR1lM1VEAh6VrkV/export?format=csv&gid=506146758";
+        // CONFIGURACIÓN DE TU FIREBASE (Basada en tu captura de pantalla)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
+            authDomain: "skyjuice-25d01.firebaseapp.com",
+            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
+            projectId: "skyjuice-25d01",
+            storageBucket: "skyjuice-25d01.firebasestorage.app",
+        };
 
-        let stockReal = 0;
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let stockActual = 0;
 
-        async function cargarStock() {
-            try {
-                // El timestamp (t=...) obliga a Google a darnos el dato fresco
-                const res = await fetch(URL_INVENTARIO + "&t=" + new Date().getTime());
-                const data = await res.text();
-                const filas = data.split(/\r?\n/);
-                const columnas = filas[0].split(',');
-                
-                // La celda C1 es la posición 2
-                stockReal = parseInt(columnas[2]);
+        // ESCUCHAR CAMBIOS EN TIEMPO REAL
+        db.ref('stock_actual').on('value', (snapshot) => {
+            stockActual = snapshot.val() || 0;
+            actualizarInterfaz(stockActual);
+        });
 
-                const display = document.getElementById('stock-num');
-                const btn = document.getElementById('btn-comprar');
-                const statusBox = document.getElementById('status-container');
-                const ping = document.getElementById('ping-anim');
+        function actualizarInterfaz(stock) {
+            const display = document.getElementById('stock-num');
+            const btn = document.getElementById('btn-comprar');
+            const statusBox = document.getElementById('status-container');
+            const ping = document.getElementById('ping-anim');
+            const cantInput = document.getElementById('cantidad');
 
-                if (isNaN(stockReal) || stockReal <= 0) {
-                    display.innerText = "0";
-                    btn.innerText = "AGOTADO POR HOY";
-                    btn.disabled = true;
-                    btn.classList.replace('bg-slate-900', 'bg-slate-200');
-                    btn.classList.replace('text-white', 'text-slate-400');
-                    statusBox.classList.replace('bg-emerald-50', 'bg-red-50');
-                    statusBox.querySelector('span:last-child').classList.replace('text-emerald-700', 'text-red-700');
-                    ping.style.display = 'none';
-                } else {
-                    display.innerText = stockReal;
-                }
-            } catch (e) {
-                console.error("Error cargando inventario:", e);
+            display.innerText = stock;
+
+            if (stock <= 0) {
+                btn.innerText = "AGOTADO POR HOY";
+                btn.disabled = true;
+                statusBox.classList.replace('bg-emerald-50', 'bg-red-50');
+                statusBox.querySelector('span:last-child').classList.replace('text-emerald-700', 'text-red-700');
+                ping.style.display = 'none';
+                cantInput.value = 0;
+            } else {
+                btn.innerText = "ORDENAR AHORA";
+                btn.disabled = false;
+                statusBox.classList.replace('bg-red-50', 'bg-emerald-50');
+                statusBox.querySelector('span:last-child').classList.replace('text-red-700', 'text-emerald-700');
+                ping.style.display = 'flex';
+                if(parseInt(cantInput.value) === 0) cantInput.value = 1;
             }
         }
 
         function cambiarCant(v) {
             const input = document.getElementById('cantidad');
             let nueva = parseInt(input.value) + v;
-            // No deja pedir más de lo que hay en stock real
-            if (nueva >= 1 && nueva <= stockReal) {
+            if (nueva >= 1 && nueva <= stockActual) {
                 input.value = nueva;
             }
         }
 
         function irAlPago() {
             const cant = document.getElementById('cantidad').value;
-            // Esta línea te lleva al checkout pasando la cantidad elegida
             window.location.href = `checkout.html?cant=${cant}`;
         }
-
-        // Cargar stock al iniciar la página
-        cargarStock();
     </script>
 </body>
 </html>
