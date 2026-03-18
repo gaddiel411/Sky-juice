@@ -3,100 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Sky Juice | Obregón</title>
+    <title>Sky Juice Admin | Obregón</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         #panel-ventas { display: none; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .font-sky { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-900">
+<body class="bg-slate-50 font-sky text-slate-900">
 
     <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full border-t-8 border-teal-600 text-center">
-            <h2 class="text-2xl font-black mb-6 uppercase tracking-tighter text-slate-800">Sky Admin</h2>
-            <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-4 border-2 rounded-xl mb-4 text-center font-bold outline-none focus:border-teal-500 transition-all">
-            <button onclick="verificar()" class="w-full bg-teal-600 text-white py-4 rounded-xl font-bold hover:bg-teal-700 shadow-lg transition-all active:scale-95">ENTRAR</button>
-            <p id="errorMsg" class="text-red-500 text-xs mt-4 font-bold hidden">❌ Contraseña incorrecta (Usa 123)</p>
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl max-w-sm w-full border border-slate-100 text-center">
+            <h2 class="text-3xl font-black mb-6 italic tracking-tighter text-slate-800">SKY ADMIN</h2>
+            <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-4 border-2 border-slate-50 rounded-2xl mb-4 text-center font-bold outline-none focus:border-emerald-500 transition-all bg-slate-50">
+            <button onclick="verificar()" class="w-full bg-emerald-500 text-white py-4 rounded-2xl font-black shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all">ENTRAR</button>
+            <p id="errorMsg" class="text-red-500 text-[10px] mt-4 font-black uppercase hidden tracking-widest">❌ Contraseña incorrecta</p>
         </div>
     </div>
 
     <div id="panel-ventas" class="p-4 md:p-8 max-w-6xl mx-auto">
-        
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <h1 class="text-3xl font-black text-slate-800 tracking-tighter uppercase text-teal-600">Sky Juice Admin</h1>
-            <div class="flex gap-2">
-                <button onclick="cargarDatos()" class="bg-white border-2 border-slate-200 px-4 py-2 rounded-lg text-xs font-bold hover:bg-slate-50 transition-all">🔄 ACTUALIZAR PEDIDOS</button>
-                <button onclick="exportarExcel()" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition-all">📊 EXCEL</button>
-            </div>
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-black italic tracking-tighter text-slate-800">SKY JUICE <span class="text-emerald-500">ADMIN</span></h1>
+            <button onclick="cargarDatos()" class="bg-white border border-slate-200 p-3 rounded-xl hover:bg-slate-50 transition-all shadow-sm">
+                🔄
+            </button>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6 text-center">
-            <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Gestión de Inventario</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-slate-50 p-4 rounded-xl">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Definir Total</label>
-                    <div class="flex gap-1"><input type="number" id="input-set" class="w-full p-2 border rounded text-center font-bold"><button onclick="gestionarStock('set')" class="bg-blue-600 text-white px-3 rounded text-[10px] font-bold">FIJAR</button></div>
-                </div>
-                <div class="bg-green-50 p-4 rounded-xl">
-                    <label class="text-[10px] font-bold text-green-700 uppercase block mb-1">Sumar</label>
-                    <div class="flex gap-1"><input type="number" id="input-add" class="w-full p-2 border border-green-200 rounded text-center font-bold"><button onclick="gestionarStock('add')" class="bg-green-600 text-white px-3 rounded text-[10px] font-bold">SUMAR</button></div>
-                </div>
-                <div class="bg-red-50 p-4 rounded-xl">
-                    <label class="text-[10px] font-bold text-red-700 uppercase block mb-1">Restar</label>
-                    <div class="flex gap-1"><input type="number" id="input-sub" class="w-full p-2 border border-red-200 rounded text-center font-bold"><button onclick="gestionarStock('sub')" class="bg-red-600 text-white px-3 rounded text-[10px] font-bold">RESTAR</button></div>
-                </div>
-            </div>
-            <div class="flex flex-col items-center">
-                <span id="stock-actual" class="text-7xl font-black text-slate-800 leading-none">0</span>
-                <span class="text-teal-600 font-black uppercase text-xs mt-2">Botellas Disponibles</span>
-            </div>
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 mb-8 text-center">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Inventario en Tiempo Real</p>
+            <div id="stock-actual" class="text-8xl font-black text-slate-800 mb-2">--</div>
+            <p class="text-emerald-500 font-black uppercase text-[10px] tracking-widest">Botellas Disponibles</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+        <div class="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
+            <div class="p-6 border-b border-slate-50 flex justify-between items-center">
+                <h3 class="font-black uppercase text-xs tracking-widest text-slate-400">Pedidos Recientes</h3>
+                <button onclick="exportarExcel()" class="text-[10px] font-black bg-slate-900 text-white px-4 py-2 rounded-full uppercase tracking-widest">Descargar Excel</button>
+            </div>
             <div class="overflow-x-auto">
                 <table id="tabla-pedidos" class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] text-slate-400 uppercase font-black tracking-widest border-b">
+                    <thead class="bg-slate-50 text-[9px] text-slate-400 uppercase font-black tracking-widest">
                         <tr>
-                            <th class="p-4">Fecha</th>
-                            <th class="p-4">Cliente</th>
-                            <th class="p-4">WhatsApp</th>
-                            <th class="p-4">Entrega</th>
-                            <th class="p-4 text-center">Cantidad</th>
+                            <th class="p-5">Fecha</th>
+                            <th class="p-5">Cliente</th>
+                            <th class="p-5">WhatsApp</th>
+                            <th class="p-5">Entrega</th>
+                            <th class="p-5 text-center">Cant.</th>
                         </tr>
                     </thead>
-                    <tbody id="contenido-tabla" class="text-sm font-medium divide-y divide-slate-100"></tbody>
+                    <tbody id="contenido-tabla" class="text-xs font-bold divide-y divide-slate-50">
+                        </tbody>
                 </table>
             </div>
         </div>
     </div>
 
     <script>
-        // TU NUEVA URL CONECTADA
-        const URL_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRv-I4XeZa_FbPmNcOTDxw0mMU5diUn3gTBYtw8Ayff84nSkgjTKRFMbo9jfYee4CsKMZPcUWD0JxYx/pub?output=csv";
-        const MI_PASSWORD = "123";
-
-        // INVENTARIO
-        let stock = localStorage.getItem('skyJuiceStock') ? parseInt(localStorage.getItem('skyJuiceStock')) : 0;
-        document.getElementById('stock-actual').innerText = stock;
-
-        function gestionarStock(accion) {
-            let inputId = (accion === 'set') ? 'input-set' : (accion === 'add') ? 'input-add' : 'input-sub';
-            let val = parseInt(document.getElementById(inputId).value);
-            if (isNaN(val)) return;
-            if (accion === 'set') stock = val;
-            else if (accion === 'add') stock += val;
-            else if (accion === 'sub') stock = Math.max(0, stock - val);
-            localStorage.setItem('skyJuiceStock', stock);
-            document.getElementById('stock-actual').innerText = stock;
-            document.getElementById(inputId).value = "";
-        }
-
-        // LOGIN
+        // ESTA ES LA URL DE TU HOJA DE "RESPUESTAS DE FORMULARIO 1"
+        const URL_CSV_PEDIDOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSuwJooBcLa4w5CL9ZR2tWBwduiJGsXiPMUkIauf7oaqOCSOws5cNnfUJQKOhQapoR1lM1VEAh6VrkV/pub?gid=506146758&single=true&output=csv";
+        
         function verificar() {
-            if(document.getElementById('passInput').value === MI_PASSWORD) {
-                document.getElementById('login-box').style.display = 'none';
+            if(document.getElementById('passInput').value === "123") {
+                document.getElementById('login-box').classList.add('hidden');
                 document.getElementById('panel-ventas').style.display = 'block';
                 cargarDatos();
             } else {
@@ -104,32 +73,55 @@
             }
         }
 
-        // CARGAR DATOS
         async function cargarDatos() {
             try {
-                const response = await fetch(URL_CSV + "&nocache=" + new Date().getTime());
+                const response = await fetch(URL_CSV_PEDIDOS + "&nocache=" + new Date().getTime());
                 const csvData = await response.text();
+                
+                // Dividir filas correctamente manejando comas dentro de comillas
                 const filas = csvData.split(/\r?\n/).slice(1);
                 let html = "";
+                let sumaVentas = 0;
+
                 filas.forEach(f => {
                     const c = f.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     if (c.length >= 4) {
-                        html += `<tr class="hover:bg-slate-50">
-                            <td class="p-4 text-[10px] text-slate-400 font-mono">${c[0].replace(/"/g, '')}</td>
-                            <td class="p-4 font-bold uppercase">${c[1].replace(/"/g, '')}</td>
-                            <td class="p-4 text-teal-600 font-bold"><a href="https://wa.me/52${c[2].replace(/\D/g,'')}" target="_blank">📱 ${c[2].replace(/"/g, '')}</a></td>
-                            <td class="p-4 text-xs italic text-slate-500">${c[3].replace(/"/g, '')}</td>
-                            <td class="p-4 text-center font-black">${c[4] ? c[4].replace(/"/g, '') : '1'}</td>
+                        const fecha = c[0].replace(/"/g, '').split(' ')[0]; // Solo fecha sin hora para limpiar
+                        const nombre = c[1].replace(/"/g, '') || "---";
+                        const whatsapp = c[2].replace(/"/g, '').replace(/\D/g,'');
+                        const entrega = c[3].replace(/"/g, '') || "Recolección";
+                        const cantidad = parseInt(c[4].replace(/"/g, '')) || 1;
+                        
+                        sumaVentas += cantidad;
+
+                        html += `<tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-5 text-slate-400 font-mono text-[10px]">${fecha}</td>
+                            <td class="p-5 uppercase text-slate-700">${nombre}</td>
+                            <td class="p-5">
+                                <a href="https://wa.me/52${whatsapp}" target="_blank" class="text-emerald-500 flex items-center gap-1">
+                                    📱 ${whatsapp}
+                                </a>
+                            </td>
+                            <td class="p-5 text-slate-400 italic font-medium">${entrega}</td>
+                            <td class="p-5 text-center font-black text-slate-900">${cantidad}</td>
                         </tr>`;
                     }
                 });
-                document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-10 text-center italic">No hay pedidos registrados</td></tr>';
-            } catch (e) { console.error(e); }
+
+                document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-10 text-center text-slate-300">No hay pedidos registrados</td></tr>';
+                
+                // Cálculo de Stock (Stock Inicial 20 - Ventas)
+                // Esto lo puedes cambiar a tu gusto
+                document.getElementById('stock-actual').innerText = Math.max(0, 20 - sumaVentas);
+
+            } catch (e) {
+                console.error("Error al cargar pedidos:", e);
+            }
         }
 
         function exportarExcel() {
             const lib = XLSX.utils.table_to_book(document.getElementById("tabla-pedidos"));
-            XLSX.writeFile(lib, "Ventas_SkyJuice.xlsx");
+            XLSX.writeFile(lib, "Ventas_SkyJuice_Obregon.xlsx");
         }
     </script>
 </body>
