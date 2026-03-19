@@ -12,34 +12,51 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-100 p-4 text-slate-900">
+<body class="bg-slate-100 p-4 sm:p-8 text-slate-900">
 
-    <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-[3rem] p-8 border-t-[12px] border-emerald-500 mt-4 text-center">
-        <h1 class="text-4xl font-[900] mb-2 tracking-tighter uppercase italic text-slate-800 text-center">CONFIRMAR <span class="text-emerald-500">PEDIDO</span></h1>
+    <div class="max-w-xl mx-auto bg-white shadow-2xl rounded-[3rem] p-8 sm:p-12 border-t-[12px] border-emerald-500 mt-4 text-center">
         
-        <form id="pagoForm" class="space-y-8 text-left mt-8">
-            <div class="bg-slate-50 p-8 rounded-[2rem] border-2">
+        <h1 class="text-4xl font-[900] mb-2 tracking-tighter uppercase italic text-slate-800">CONFIRMAR <span class="text-emerald-500">PEDIDO</span></h1>
+        <p class="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-10 text-center">Sky Juice Obregón</p>
+        
+        <form id="pagoForm" class="space-y-8 text-left">
+            
+            <div class="bg-slate-50 p-8 rounded-[2rem] border-2 border-slate-100">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="font-black uppercase italic">Cantidad:</span>
-                    <span id="display-cant" class="font-[900] text-emerald-600 text-3xl">--</span>
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Tu Pedido:</span>
+                    <span id="display-cant" class="font-[900] text-emerald-600 text-3xl italic">--</span>
                 </div>
-                <div class="flex justify-between items-center border-t-2 pt-4">
-                    <span class="font-black uppercase italic">Total:</span>
+                <div class="flex justify-between items-center border-t-2 border-dashed border-slate-200 pt-4">
+                    <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Total a Pagar:</span>
                     <span id="display-total" class="font-[900] text-slate-900 text-3xl">$0</span>
                 </div>
             </div>
 
             <div class="space-y-6">
-                <input type="text" id="nombre" required placeholder="TU NOMBRE" class="w-full p-5 text-xl border-2 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-black uppercase italic">
-                <div class="flex gap-3">
-                    <select id="codigo-pais" class="bg-slate-50 border-2 rounded-3xl px-4 text-xl font-bold"><option value="52">🇲🇽 +52</option></select>
-                    <input type="tel" id="whatsapp" required placeholder="TU TELÉFONO" class="flex-1 p-5 text-xl border-2 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-black">
+                <div>
+                    <label class="text-xs font-black text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Nombre Completo</label>
+                    <input type="text" id="nombre" required placeholder="Ej. Juan Pérez" 
+                           class="w-full p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold uppercase italic">
+                </div>
+                
+                <div>
+                    <label class="text-xs font-black text-slate-500 uppercase tracking-widest ml-4 mb-2 block">Tu WhatsApp</label>
+                    <div class="flex gap-3">
+                        <select id="codigo-pais" class="bg-slate-50 border-2 border-slate-100 rounded-3xl px-4 text-xl font-bold outline-none">
+                            <option value="52">🇲🇽 +52</option>
+                        </select>
+                        <input type="tel" id="whatsapp" required placeholder="6441234567" 
+                               class="flex-1 p-5 text-xl border-2 border-slate-100 rounded-3xl outline-none focus:border-emerald-500 bg-slate-50 font-bold">
+                    </div>
                 </div>
             </div>
 
-            <button type="submit" id="btn-finalizar" class="w-full bg-emerald-500 text-white font-[900] py-6 rounded-[2rem] shadow-2xl uppercase tracking-widest text-lg hover:bg-emerald-600 transition-all active:scale-95">
+            <button type="submit" id="btn-finalizar" 
+                    class="w-full bg-emerald-500 text-white font-[900] py-6 rounded-[2rem] shadow-2xl uppercase tracking-widest text-lg hover:bg-emerald-600 transition-all active:scale-95">
                 CONFIRMAR PEDIDO
             </button>
+
+            <p id="error-msg" class="text-red-600 text-xs font-black uppercase mt-4 text-center hidden"></p>
         </form>
     </div>
 
@@ -52,11 +69,12 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const stockRef = db.ref('stock_actual'); // DIRECCIÓN EXACTA DEL ADMIN
+        const stockRef = db.ref('stock_actual');
 
         const params = new URLSearchParams(window.location.search);
         const cant = parseInt(params.get('cantidad')) || 1;
-        document.getElementById('display-cant').innerText = cant;
+
+        document.getElementById('display-cant').innerText = `${cant} ${cant === 1 ? 'jugo' : 'jugos'}`;
         document.getElementById('display-total').innerText = `$${cant * 40}`;
 
         document.getElementById('pagoForm').onsubmit = async function(e) {
@@ -66,47 +84,48 @@
             const tel = `+${document.getElementById('codigo-pais').value} ${document.getElementById('whatsapp').value}`;
             
             btn.disabled = true;
-            btn.innerText = "VERIFICANDO...";
+            btn.innerText = "PROCESANDO...";
 
-            // PARCHE: Forzamos lectura fresca antes de la transacción
-            const snapshotStock = await stockRef.get();
-            const valorActual = snapshotStock.val();
+            try {
+                // 1. Forzar lectura fresca
+                const snap = await stockRef.get();
+                const stockDisponible = snap.val() || 0;
 
-            if (valorActual === null || valorActual < cant) {
-                alert("¡Lo sentimos! Solo quedan " + (valorActual || 0) + " jugos. Actualiza el stock en el Admin.");
-                btn.disabled = false;
-                btn.innerText = "CONFIRMAR PEDIDO";
-                return;
-            }
-
-            stockRef.transaction((current) => {
-                if (current >= cant) return current - cant;
-                return;
-            }, (error, committed, snapshot) => {
-                if (committed) {
-                    // MANDA A FIREBASE PARA EL ADMIN EN VIVO
-                    db.ref('pedidos').push({
-                        nombre: nom,
-                        whatsapp: tel,
-                        cantidad: cant,
-                        fecha: new Date().toLocaleString(),
-                        entrega: "RECOLECCIÓN"
-                    });
-
-                    // GOOGLE SHEETS DE RESPALDO
-                    const data = new URLSearchParams();
-                    data.append("entry.796663698", nom);
-                    data.append("entry.504990176", tel);
-                    data.append("entry.1018610744", cant);
-                    fetch("https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse", { method: "POST", mode: "no-cors", body: data });
-
-                    window.location.href = `https://wa.me/526441880995?text=¡HOLA! Soy ${nom}, pedí ${cant} jugos.`;
-                } else {
+                if (stockDisponible < cant) {
+                    alert("¡Lo sentimos! Solo quedan " + stockDisponible + " jugos.");
                     btn.disabled = false;
                     btn.innerText = "CONFIRMAR PEDIDO";
-                    alert("Error de stock. Intenta de nuevo.");
+                    return;
                 }
-            });
+
+                // 2. Descontar stock directo (ahora que las reglas son públicas)
+                await stockRef.set(stockDisponible - cant);
+
+                // 3. Registrar pedido en Firebase para el Admin en tiempo real
+                await db.ref('pedidos').push({
+                    nombre: nom,
+                    whatsapp: tel,
+                    cantidad: cant,
+                    fecha: new Date().toLocaleString(),
+                    entrega: "RECOLECCIÓN"
+                });
+
+                // 4. Mandar a Google Sheets (respaldo)
+                const data = new URLSearchParams();
+                data.append("entry.796663698", nom);
+                data.append("entry.504990176", tel);
+                data.append("entry.1018610744", cant);
+                fetch("https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse", { method: "POST", mode: "no-cors", body: data });
+
+                // 5. Ir a WhatsApp
+                window.location.href = `https://wa.me/526441880995?text=¡HOLA! Soy ${nom}, pedí ${cant} jugos.`;
+
+            } catch (error) {
+                console.error(error);
+                alert("Error de conexión. Intenta de nuevo.");
+                btn.disabled = false;
+                btn.innerText = "CONFIRMAR PEDIDO";
+            }
         };
     </script>
 </body>
