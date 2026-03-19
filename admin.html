@@ -2,15 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sky Admin | Sky Juice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         #panel-ventas { display: none; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-900">
@@ -18,46 +19,50 @@
     <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-xs border-t-8 border-teal-600 text-center">
             <h2 class="text-2xl font-black mb-6 uppercase italic">Sky Admin</h2>
-            <input type="password" id="passInput" placeholder="PASS" class="w-full p-4 border-2 rounded-xl mb-4 text-center font-black text-xl outline-none focus:border-teal-500 bg-slate-50">
+            <input type="password" id="passInput" placeholder="PASS" class="w-full h-14 p-4 border-2 rounded-xl mb-4 text-center font-black text-xl outline-none focus:border-teal-500 bg-slate-50">
             <button onclick="verificar()" class="w-full bg-teal-600 text-white py-4 rounded-xl font-black uppercase shadow-lg">Entrar</button>
         </div>
     </div>
 
-    <div id="panel-ventas" class="p-4 max-w-4xl mx-auto">
-        <h1 class="text-2xl font-black text-slate-800 italic uppercase mb-6 text-center">SKY JUICE <span class="text-teal-600">PANEL</span></h1>
+    <div id="panel-ventas" class="p-4 max-w-lg mx-auto">
+        <h1 class="text-2xl font-black text-slate-800 italic uppercase mb-6 text-center">SKY JUICE <span class="text-teal-600 text-3xl">PANEL</span></h1>
 
-        <div class="bg-white p-4 rounded-[2rem] shadow-lg border mb-6">
-            <div class="grid grid-cols-3 gap-2 mb-6">
-                <div class="bg-slate-50 p-2 rounded-xl border text-center">
-                    <label class="text-[8px] font-black uppercase block mb-1">Fijar</label>
-                    <input type="number" id="input-set" placeholder="0" class="w-full p-1 text-center font-bold border rounded mb-1">
-                    <button onclick="gestionarStock('set')" class="w-full bg-blue-600 text-white py-1 rounded text-[10px] font-black">SET</button>
+        <div class="bg-white p-5 rounded-[2.5rem] shadow-lg border mb-6">
+            <div class="grid grid-cols-3 gap-3 mb-6">
+                
+                <div class="bg-slate-50 p-2 rounded-2xl border flex flex-col items-center">
+                    <label class="text-[9px] font-black uppercase mb-1">Fijar</label>
+                    <input type="number" id="input-set" placeholder="0" class="w-full h-10 text-center font-bold border rounded-lg mb-2 text-sm outline-none">
+                    <button onclick="gestionarStock('set')" class="w-full bg-blue-600 text-white py-2 rounded-lg text-[10px] font-black uppercase italic shadow-sm active:scale-95 transition-all">SET</button>
                 </div>
-                <div class="bg-green-50 p-2 rounded-xl border text-center">
-                    <label class="text-[8px] font-black uppercase block mb-1">Suma</label>
-                    <input type="number" id="input-add" placeholder="0" class="w-full p-1 text-center font-bold border rounded mb-1">
-                    <button onclick="gestionarStock('add')" class="w-full bg-green-600 text-white py-1 rounded text-[10px] font-black">ADD</button>
+
+                <div class="bg-green-50 p-2 rounded-2xl border flex flex-col items-center">
+                    <label class="text-[9px] font-black uppercase mb-1 text-green-700">Suma</label>
+                    <input type="number" id="input-add" placeholder="+" class="w-full h-10 text-center font-bold border border-green-200 rounded-lg mb-2 text-sm text-green-700 outline-none bg-white">
+                    <button onclick="gestionarStock('add')" class="w-full bg-green-600 text-white py-2 rounded-lg text-[10px] font-black uppercase italic shadow-sm active:scale-95 transition-all">ADD</button>
                 </div>
-                <div class="bg-red-50 p-2 rounded-xl border text-center">
-                    <label class="text-[8px] font-black uppercase block mb-1">Resta</label>
-                    <input type="number" id="input-sub" placeholder="0" class="w-full p-1 text-center font-bold border rounded mb-1">
-                    <button onclick="gestionarStock('sub')" class="w-full bg-red-600 text-white py-1 rounded text-[10px] font-black">SUB</button>
+
+                <div class="bg-red-50 p-2 rounded-2xl border flex flex-col items-center">
+                    <label class="text-[9px] font-black uppercase mb-1 text-red-700">Resta</label>
+                    <input type="number" id="input-sub" placeholder="-" class="w-full h-10 text-center font-bold border border-red-200 rounded-lg mb-2 text-sm text-red-700 outline-none bg-white">
+                    <button onclick="gestionarStock('sub')" class="w-full bg-red-600 text-white py-2 rounded-lg text-[10px] font-black uppercase italic shadow-sm active:scale-95 transition-all">SUB</button>
                 </div>
+
             </div>
 
-            <div class="flex flex-col items-center">
+            <div class="flex flex-col items-center py-4 border-t border-slate-100">
                 <span id="stock-actual" class="text-7xl font-[900] text-slate-800 leading-none italic tracking-tighter">--</span>
-                <p class="text-teal-600 font-black uppercase text-[10px] mt-2">Existencia Actual</p>
+                <p class="text-teal-600 font-black uppercase text-[10px] mt-2 tracking-widest italic">Existencia Actual</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-lg border overflow-hidden">
+        <div class="bg-white rounded-[2rem] shadow-lg border overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead class="bg-slate-50 text-[9px] text-slate-400 font-black uppercase border-b">
                         <tr><th class="p-4">Cliente</th><th class="p-4">WhatsApp</th><th class="p-4 text-center">Cant.</th></tr>
                     </thead>
-                    <tbody id="contenido-tabla" class="divide-y font-bold italic text-sm"></tbody>
+                    <tbody id="contenido-tabla" class="divide-y divide-slate-50 font-bold italic text-sm"></tbody>
                 </table>
             </div>
         </div>
@@ -78,12 +83,13 @@
 
         function gestionarStock(accion) {
             let id = (accion === 'set') ? 'input-set' : (accion === 'add') ? 'input-add' : 'input-sub';
-            let val = parseInt(document.getElementById(id).value);
+            let input = document.getElementById(id);
+            let val = parseInt(input.value);
             if (isNaN(val)) return;
             if (accion === 'set') stockRef.set(val);
             else if (accion === 'add') stockRef.transaction(c => (c || 0) + val);
             else if (accion === 'sub') stockRef.transaction(c => Math.max(0, (c || 0) - val));
-            document.getElementById(id).value = ""; 
+            input.value = ""; 
         }
 
         stockRef.on('value', (s) => document.getElementById('stock-actual').innerText = s.val() || 0);
@@ -93,12 +99,11 @@
             let html = "";
             if (datos) {
                 Object.values(datos).reverse().forEach(p => {
-                    // LINK CON EL NÚMERO DEL CLIENTE
                     const telLimpio = p.whatsapp.replace(/\D/g,'');
                     html += `<tr>
-                        <td class="p-4 font-black uppercase text-xs">${p.nombre}</td>
+                        <td class="p-4 font-black uppercase text-xs leading-tight">${p.nombre}</td>
                         <td class="p-4">
-                            <a href="https://wa.me/${telLimpio}" target="_blank" class="text-teal-600 underline text-xs">
+                            <a href="https://wa.me/${telLimpio}" target="_blank" class="text-teal-600 underline text-[10px] break-all">
                                 ${p.whatsapp}
                             </a>
                         </td>
@@ -106,7 +111,7 @@
                     </tr>`;
                 });
             }
-            document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="3" class="p-10 text-center text-xs">Sin pedidos</td></tr>';
+            document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="3" class="p-10 text-center text-xs italic">Esperando pedidos...</td></tr>';
         });
     </script>
 </body>
