@@ -2,66 +2,81 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sky Juice | Jugo de Caña Natural</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            /* Evita el zoom por doble clic en toda la página */
+            touch-action: manipulation; 
+        }
+
+        /* Aplicado específicamente a botones para mayor seguridad */
+        button {
+            touch-action: manipulation;
+        }
+
+        input::-webkit-outer-spin-button, 
+        input::-webkit-inner-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
 
-    <div class="max-w-md mx-auto min-h-screen flex flex-col p-4 sm:p-6">
-        <header class="text-center py-6 sm:py-10">
-            <h1 class="text-4xl sm:text-5xl font-[900] italic tracking-tighter uppercase text-slate-800">SKY <span class="text-emerald-500">JUICE</span></h1>
-            <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Natural & Fresh • Obregón</p>
+    <div class="max-w-md mx-auto min-h-screen flex flex-col p-6">
+        <header class="text-center py-10">
+            <h1 class="text-5xl font-[900] italic tracking-tighter uppercase text-slate-800">SKY <span class="text-emerald-500">JUICE</span></h1>
+            <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Natural & Fresh • Obregón</p>
         </header>
 
-        <div class="bg-white rounded-[2.5rem] sm:rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden border border-slate-100">
+        <div class="bg-white rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden border border-slate-100">
             <div class="p-2">
-                <img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1000&auto=format&fit=crop" class="w-full h-64 sm:h-80 object-cover rounded-[2rem] sm:rounded-[2.5rem]">
+                <img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1000&auto=format&fit=crop" class="w-full h-80 object-cover rounded-[2.5rem]">
             </div>
             
-            <div class="p-6 sm:p-8">
+            <div class="p-8">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-2xl sm:text-3xl font-[900] uppercase text-slate-800 italic">Jugo de Caña</h2>
-                        <p class="text-[10px] sm:text-xs text-slate-400 font-black uppercase tracking-widest">Botella Fresh 500ml</p>
+                        <h2 class="text-3xl font-[900] uppercase text-slate-800 italic">Jugo de Caña</h2>
+                        <p class="text-xs text-slate-400 font-black uppercase tracking-widest">Botella Fresh 500ml</p>
                     </div>
-                    <span class="text-2xl sm:text-3xl font-[900] text-emerald-500">$40</span>
+                    <span class="text-3xl font-[900] text-emerald-500">$40</span>
                 </div>
 
-                <div id="status-badge" class="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full mb-6 border border-emerald-100">
+                <div id="status-badge" class="inline-flex items-center gap-2 bg-emerald-50 px-5 py-2 rounded-full mb-8 border border-emerald-100">
                     <span id="ping" class="relative flex h-3 w-3">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                     </span>
-                    <span class="text-[10px] sm:text-xs font-[900] uppercase tracking-widest text-emerald-700">
-                        ¡Quedan <span id="stock-num" class="text-base sm:text-lg">--</span> disponibles!
+                    <span class="text-xs font-[900] uppercase tracking-widest text-emerald-700">
+                        ¡Quedan <span id="stock-num" class="text-lg">--</span> disponibles!
                     </span>
                 </div>
 
-                <div class="flex items-center justify-between bg-slate-50 p-4 sm:p-5 rounded-[2rem] mb-8 border-2 border-slate-100">
-                    <span class="text-[10px] font-black uppercase text-slate-400 px-1 sm:px-2 tracking-widest">¿Cuántos?</span>
-                    <div class="flex items-center gap-4 sm:gap-8">
-                        <button onclick="cambiarCantCliente(-1)" class="w-8 h-8 flex items-center justify-center font-black text-2xl text-slate-300 hover:text-emerald-500 transition-colors">-</button>
-                        <input type="number" id="cant-cliente" value="1" readonly class="w-10 bg-transparent text-center font-[900] text-2xl sm:text-3xl text-slate-800 outline-none">
-                        <button onclick="cambiarCantCliente(1)" class="w-8 h-8 flex items-center justify-center font-black text-2xl text-slate-300 hover:text-emerald-500 transition-colors">+</button>
+                <div class="flex items-center justify-between bg-slate-50 p-5 rounded-[2rem] mb-8 border-2 border-slate-100">
+                    <span class="text-xs font-black uppercase text-slate-400 px-2 tracking-widest">¿Cuántos?</span>
+                    <div class="flex items-center gap-8">
+                        <button onclick="cambiarCantCliente(-1)" class="w-10 h-10 flex items-center justify-center font-black text-3xl text-slate-300 hover:text-emerald-500 transition-colors">-</button>
+                        <input type="number" id="cant-cliente" value="1" readonly class="w-12 bg-transparent text-center font-[900] text-3xl text-slate-800 outline-none">
+                        <button onclick="cambiarCantCliente(1)" class="w-10 h-10 flex items-center justify-center font-black text-3xl text-slate-300 hover:text-emerald-500 transition-colors">+</button>
                     </div>
                 </div>
 
-                <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-[900] py-5 sm:py-6 rounded-[2rem] shadow-2xl hover:bg-black transition-all active:scale-95 uppercase tracking-[0.2em] text-base sm:text-lg disabled:bg-slate-200 disabled:text-slate-400">
+                <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-[900] py-6 rounded-[2rem] shadow-2xl hover:bg-black transition-all active:scale-95 uppercase tracking-[0.2em] text-lg disabled:bg-slate-200 disabled:text-slate-400">
                     ORDENAR AHORA
                 </button>
             </div>
         </div>
 
-        <footer class="mt-auto py-8 text-center">
-            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-300 italic">© 2026 Sky Juice Obregón</p>
+        <footer class="mt-auto py-10 text-center">
+            <p class="text-[10px] font-black uppercase tracking-[0.5em] text-slate-300 italic">© 2026 Sky Juice Obregón</p>
         </footer>
     </div>
 
