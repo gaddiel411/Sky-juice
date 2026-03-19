@@ -3,63 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finalizar Pedido | Sky Juice</title>
+    <title>Checkout | Sky Juice</title>
+    
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23ffffff%22/><text y=%2250%%22 x=%2235%%22 font-family=%22Inter, sans-serif%22 font-weight=%22900%22 font-size=%2260%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%23000000%22>S</text><text y=%2250%%22 x=%2270%%22 font-family=%22Inter, sans-serif%22 font-weight=%22900%22 font-size=%2260%22 text-anchor=%22middle%22 dy=%22.35em%22 fill=%22%2310b981%22>J</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        /* Evita que el zoom automático en iPhone rompa el diseño */
-        input, select { font-size: 16px !important; }
+        body { font-family: 'Inter', sans-serif; touch-action: manipulation; overflow-x: hidden; }
+        .step-hidden { display: none; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        select { background-image: none; appearance: none; -webkit-appearance: none; }
     </style>
 </head>
-<body class="bg-slate-100 p-4 text-slate-900">
+<body class="bg-slate-50 text-slate-900">
 
-    <div class="max-w-md mx-auto bg-white shadow-2xl rounded-[2.5rem] p-6 border-t-[10px] border-emerald-500 mt-2 text-center">
+    <div class="max-w-md mx-auto min-h-screen flex flex-col p-5 sm:p-6">
         
-        <h1 class="text-3xl font-[900] mb-1 tracking-tighter uppercase italic text-slate-800">CONFIRMAR <span class="text-emerald-500">PEDIDO</span></h1>
-        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-6 text-center">Sky Juice Obregón</p>
-        
-        <form id="pagoForm" class="space-y-6 text-left">
-            
-            <div class="bg-slate-50 p-6 rounded-[2rem] border-2 border-slate-100">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic text-left">Pedido:</span>
-                    <span id="display-cant" class="font-[900] text-emerald-600 text-2xl italic">--</span>
-                </div>
-                <div class="flex justify-between items-center border-t-2 border-dashed border-slate-200 pt-2">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic text-left">Total:</span>
-                    <span id="display-total" class="font-[900] text-slate-900 text-2xl">$0</span>
+        <header class="mb-8 text-center">
+            <button id="btn-regresar" onclick="irAtras()" class="block mx-auto text-slate-400 font-black text-[10px] uppercase tracking-[0.3em] outline-none mb-4">← Regresar</button>
+            <h1 id="main-title" class="text-4xl font-[900] italic tracking-tighter uppercase text-slate-800 leading-none w-full">Datos de <span class="text-emerald-500">envío</span></h1>
+        </header>
+
+        <div id="step-1" class="bg-white rounded-[3rem] shadow-2xl p-8 border border-slate-100">
+            <div class="mb-6">
+                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 italic">¿A nombre de quién?</label>
+                <input type="text" id="nombre" placeholder="Tu nombre completo" class="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-black outline-none focus:border-emerald-500 transition-all text-lg">
+            </div>
+
+            <div class="mb-8">
+                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2 italic">WhatsApp de contacto</label>
+                <div class="flex gap-2 w-full">
+                    <select id="lada" class="w-24 flex-shrink-0 bg-slate-50 border-2 border-slate-100 rounded-2xl px-2 font-black outline-none focus:border-emerald-500 text-base text-center">
+                        <option value="52">🇲🇽 +52</option>
+                        <option value="1">🇺🇸 +1</option>
+                    </select>
+                    <input type="tel" id="whatsapp" placeholder="6441234567" class="flex-1 min-w-0 bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 font-black outline-none focus:border-emerald-500 transition-all text-lg">
                 </div>
             </div>
 
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 mb-1 block italic">Nombre Completo</label>
-                    <input type="text" id="nombre" required placeholder="TU NOMBRE" 
-                           class="w-full h-14 p-4 text-lg border-2 border-slate-100 rounded-2xl outline-none focus:border-emerald-500 bg-slate-50 font-black uppercase italic">
-                </div>
-                
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 mb-1 block italic">Tu WhatsApp</label>
-                    <div class="flex gap-2 w-full">
-                        <div class="relative w-24 flex-shrink-0">
-                            <select id="codigo-pais" class="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-2 text-sm font-bold outline-none appearance-none text-center">
-                                <option value="52">🇲🇽 +52</option>
-                            </select>
-                        </div>
-                        <input type="tel" id="whatsapp" required placeholder="6441234567" 
-                               class="flex-1 h-14 p-4 text-lg border-2 border-slate-100 rounded-2xl outline-none focus:border-emerald-500 bg-slate-50 font-bold min-w-0">
-                    </div>
+            <div class="mb-8 p-5 bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200">
+                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 italic text-center">Punto de entrega</label>
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">📍</span>
+                    <p class="text-sm font-black text-slate-700 leading-tight italic">
+                        Calle Ejemplo #123, entre X y Y, <br>Col. Centro, Obregón.
+                    </p>
                 </div>
             </div>
 
-            <button type="submit" id="btn-finalizar" 
-                    class="w-full bg-emerald-500 text-white font-[900] py-5 rounded-2xl shadow-xl uppercase tracking-widest text-lg hover:bg-emerald-600 active:scale-95 transition-all">
-                CONFIRMAR PEDIDO
+            <div class="bg-emerald-50 rounded-[2rem] p-6 mb-8 border-2 border-emerald-100 text-center">
+                <p class="text-[10px] font-black uppercase text-emerald-700 tracking-widest mb-1">Total a pagar:</p>
+                <span id="total-preview" class="text-4xl font-[900] text-emerald-600 italic">$0</span>
+            </div>
+
+            <button onclick="confirmarPedido()" class="w-full bg-slate-900 text-white font-[900] py-6 rounded-[2rem] shadow-xl active:scale-95 transition-all uppercase tracking-widest text-lg">
+                Registrar pedido
             </button>
-        </form>
+        </div>
+
+        <div id="step-2" class="step-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div class="bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-slate-100">
+                <div class="bg-emerald-500 p-6 text-center">
+                    <h2 class="text-white font-[900] italic uppercase text-2xl tracking-tighter leading-none">¡Pedido registrado!</h2>
+                    <p class="text-emerald-100 text-[10px] font-black uppercase tracking-[0.2em] mt-2">Sigue estos pasos para finalizar</p>
+                </div>
+
+                <div class="p-6 sm:p-8 text-center">
+                    <div class="mb-8">
+                        <p class="text-lg font-black text-slate-800 leading-tight italic">
+                            Por favor, transfiere <span id="monto-final-texto" class="text-emerald-600 text-2xl underline decoration-emerald-200">$0</span> a la siguiente cuenta:
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-[2.5rem] border-2 border-slate-100 shadow-inner mb-8 text-left">
+                        <div class="mb-4">
+                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Banco / Institución</p>
+                            <p class="font-[900] text-slate-800 text-xl uppercase italic">Banco Coppel / NU</p>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">Número de Tarjeta / CLABE</p>
+                            <p class="font-[900] text-2xl text-slate-900 tracking-tighter">1234 5678 9012 3456</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest">A nombre de:</p>
+                            <p class="font-[900] text-slate-800 italic">Nombre del Titular</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-emerald-50 border-2 border-emerald-100 p-5 rounded-[2rem] mb-6">
+                        <p class="text-lg font-[900] text-emerald-900 italic leading-tight">Una vez hecho, favor de enviar captura de pantalla del comprobante por WhatsApp.</p>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-3 mb-8 px-4 bg-red-50 p-5 rounded-[2rem] border border-red-100">
+                        <span class="text-3xl animate-pulse">⏳</span>
+                        <p class="text-sm font-[900] text-red-700 leading-tight text-left tracking-tight">
+                            Tienes 2 horas para enviar el comprobante antes de que tu pedido expire.
+                        </p>
+                    </div>
+
+                    <button onclick="finalizarTodo()" class="w-full bg-emerald-500 text-white font-[900] py-7 rounded-[2.5rem] shadow-2xl active:scale-95 transition-all uppercase tracking-[0.15em] text-xl">
+                        Abrir WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="step-final" class="step-hidden animate-in zoom-in duration-500">
+            <div class="bg-white rounded-[3rem] shadow-2xl p-10 border border-slate-100 text-center">
+                <div class="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-lg">✓</div>
+                <h2 class="text-3xl font-[900] italic uppercase text-slate-800 leading-none mb-4">¡Gracias por <span class="text-emerald-500">tu compra</span>!</h2>
+                <p class="text-slate-500 font-bold leading-tight mb-8 text-lg">En seguida nos comunicaremos contigo para confirmar tu entrega.</p>
+                
+                <button onclick="localStorage.clear(); location.reload();" class="text-slate-300 font-black text-[10px] uppercase tracking-widest hover:text-slate-500">Hacer otro pedido</button>
+            </div>
+        </div>
+
+        <footer class="mt-auto py-10 text-center">
+            <p class="text-[10px] font-black uppercase tracking-[0.5em] text-slate-300 italic">© 2026 Sky Juice Obregón</p>
+        </footer>
     </div>
 
     <script>
@@ -67,67 +131,85 @@
             apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
             authDomain: "skyjuice-25d01.firebaseapp.com",
             databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
-            projectId: "skyjuice-25d01"
+            projectId: "skyjuice-25d01",
+            storageBucket: "skyjuice-25d01.firebasestorage.app",
+            messagingSenderId: "698344960386",
+            appId: "1:698344960386:web:17d40a2eed4393ad311f9b"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const stockRef = db.ref('stock_actual');
 
-        const params = new URLSearchParams(window.location.search);
-        const cant = parseInt(params.get('cantidad')) || 1;
-
-        document.getElementById('display-cant').innerText = `${cant} ${cant === 1 ? 'jugo' : 'jugos'}`;
-        document.getElementById('display-total').innerText = `$${cant * 40}`;
-
-        document.getElementById('pagoForm').onsubmit = async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-finalizar');
-            const nom = document.getElementById('nombre').value;
-            const tel = `+${document.getElementById('codigo-pais').value} ${document.getElementById('whatsapp').value}`;
-            
-            btn.disabled = true;
-            btn.innerText = "PROCESANDO...";
-
-            try {
-                // Forzamos lectura fresca para evitar el error de null/0
-                const snap = await stockRef.get();
-                const stockDisponible = snap.val() || 0;
-
-                if (stockDisponible < cant) {
-                    alert("¡Lo sentimos! Solo quedan " + stockDisponible + " jugos.");
-                    btn.disabled = false;
-                    btn.innerText = "CONFIRMAR PEDIDO";
-                    return;
-                }
-
-                // Descontamos stock
-                await stockRef.set(stockDisponible - cant);
-
-                // Registramos el pedido
-                await db.ref('pedidos').push({
-                    nombre: nom,
-                    whatsapp: tel,
-                    cantidad: cant,
-                    fecha: new Date().toLocaleString()
-                });
-
-                // Google Sheets (Opcional - Quitar si no lo usas)
-                const data = new URLSearchParams();
-                data.append("entry.796663698", nom);
-                data.append("entry.504990176", tel);
-                data.append("entry.1018610744", cant);
-                fetch("https://docs.google.com/forms/d/e/1FAIpQLSdzQWFhjdLQKUN-xgKMqbB39rqTDx-KJoAsAECS3MSdsFsTrQ/formResponse", { method: "POST", mode: "no-cors", body: data });
-
-                // Al WhatsApp
-                window.location.href = `https://wa.me/526441880995?text=¡HOLA! Soy ${nom}, pedí ${cant} jugos.`;
-
-            } catch (error) {
-                console.error(error);
-                alert("Error de conexión. Intenta de nuevo.");
-                btn.disabled = false;
-                btn.innerText = "CONFIRMAR PEDIDO";
+        window.onload = function() {
+            if (localStorage.getItem('pedidoFinalizado') === 'true') {
+                mostrarPantallaFinal();
             }
         };
+
+        const params = new URLSearchParams(window.location.search);
+        const cantidad = parseInt(params.get('cantidad')) || 1;
+        const total = cantidad * 40;
+
+        document.getElementById('total-preview').innerText = `$${total}`;
+        document.getElementById('monto-final-texto').innerText = `$${total}`;
+
+        function irAtras() {
+            const step1 = document.getElementById('step-1');
+            const step2 = document.getElementById('step-2');
+            if (!step2.classList.contains('step-hidden')) {
+                step2.classList.add('step-hidden');
+                step1.classList.remove('step-hidden');
+            } else {
+                window.location.href = "index.html";
+            }
+        }
+
+        function confirmarPedido() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const lada = document.getElementById('lada').value;
+            const tel = document.getElementById('whatsapp').value.trim();
+            
+            if (!nombre || !tel) {
+                alert("Completa todos los datos, porfa.");
+                return;
+            }
+
+            const pedido = {
+                nombre: nombre, 
+                whatsapp: "+" + lada + tel,
+                cantidad: cantidad,
+                total: total,
+                fecha: new Date().toLocaleString('es-MX', { timeZone: 'America/Hermosillo' }),
+                estado: "EN DEUDA"
+            };
+
+            db.ref('pedidos').push(pedido).then(() => {
+                db.ref('stock_actual').transaction((current) => (current || 0) - cantidad);
+                document.getElementById('step-1').classList.add('step-hidden');
+                document.getElementById('step-2').classList.remove('step-hidden');
+                window.scrollTo(0, 0);
+            });
+        }
+
+        function finalizarTodo() {
+            const nombre = document.getElementById('nombre').value;
+            localStorage.setItem('pedidoFinalizado', 'true');
+            const mensaje = `¡Hola! Soy ${nombre}. Acabo de registrar mi pedido de ${cantidad} Sky Juice ($${total}). Aquí tienes mi comprobante.`;
+            const urlWA = `https://wa.me/526441234567?text=${encodeURIComponent(mensaje)}`;
+            window.location.href = urlWA; 
+        }
+
+        function mostrarPantallaFinal() {
+            document.getElementById('step-1').classList.add('step-hidden');
+            document.getElementById('step-2').classList.add('step-hidden');
+            
+            const btnRegresar = document.getElementById('btn-regresar');
+            btnRegresar.style.display = 'none';
+            
+            const mainTitle = document.getElementById('main-title');
+            mainTitle.innerHTML = 'Status de <span class="text-emerald-500">pedido</span>';
+            
+            document.getElementById('step-final').classList.remove('step-hidden');
+        }
     </script>
 </body>
 </html>
