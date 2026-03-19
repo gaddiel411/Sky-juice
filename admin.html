@@ -25,6 +25,13 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             min-height: 140px;
         }
+
+        /* Mejora para el scroll en móviles */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        table { min-width: 600px; } /* Asegura que la tabla no se colapse en pantallas mini */
     </style>
 </head>
 <body class="bg-slate-100 text-slate-900">
@@ -42,7 +49,6 @@
         <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-4">
             <h1 class="text-3xl lg:text-5xl font-[900] text-slate-800 italic uppercase">SKY JUICE <span class="text-teal-600">FINANCE</span></h1>
             <div class="flex gap-2 w-full lg:w-auto">
-                <button id="btn-audio" onclick="permitirAudio()" class="flex-1 lg:flex-none bg-orange-500 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px] shadow-lg animate-pulse">🔊 Activar Avisos</button>
                 <button onclick="exportarExcel()" class="flex-1 lg:flex-none bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px]">📊 Excel</button>
                 <button onclick="limpiarPedidos()" class="flex-1 lg:flex-none bg-slate-800 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px]">🧹 Limpiar</button>
             </div>
@@ -73,18 +79,20 @@
             </div>
 
             <div class="lg:col-span-9 bg-white rounded-[2.5rem] shadow-xl border overflow-hidden">
-                <table id="tabla-pedidos" class="w-full text-left">
-                    <thead class="bg-slate-50 text-[10px] text-slate-400 font-black uppercase border-b">
-                        <tr>
-                            <th class="p-6">Fecha</th>
-                            <th class="p-6">Cliente</th>
-                            <th class="p-6">WhatsApp</th>
-                            <th class="p-6 text-center italic">Cant.</th>
-                            <th class="p-6 text-center italic">Pago</th>
-                        </tr>
-                    </thead>
-                    <tbody id="contenido-tabla" class="divide-y font-bold italic text-sm lg:text-base"></tbody>
-                </table>
+                <div class="table-responsive">
+                    <table id="tabla-pedidos" class="w-full text-left">
+                        <thead class="bg-slate-50 text-[10px] text-slate-400 font-black uppercase border-b">
+                            <tr>
+                                <th class="p-6">Fecha</th>
+                                <th class="p-6">Cliente</th>
+                                <th class="p-6">WhatsApp</th>
+                                <th class="p-6 text-center italic">Cant.</th>
+                                <th class="p-6 text-center italic">Pago</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contenido-tabla" class="divide-y font-bold italic text-sm lg:text-base"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -141,22 +149,18 @@
         const pedidosRef = db.ref('pedidos');
 
         let cargadoInicial = false;
-        let audioHabilitado = false;
-        const sonidoCaja = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
-
-        function permitirAudio() {
-            audioHabilitado = true;
-            sonidoCaja.play();
-            document.getElementById('btn-audio').classList.remove('animate-pulse', 'bg-orange-500');
-            document.getElementById('btn-audio').classList.add('bg-slate-200', 'text-slate-400');
-            document.getElementById('btn-audio').innerText = "🔊 AUDIO LISTO";
-        }
 
         function toggleReparto() {
             document.getElementById('box-reparto').classList.toggle('hidden');
         }
 
-        function verificar() { if(document.getElementById('passInput').value === "123") { document.getElementById('login-box').style.display='none'; document.getElementById('panel-ventas').style.display='block'; if(Notification.permission !== "granted") Notification.requestPermission(); } }
+        function verificar() { 
+            if(document.getElementById('passInput').value === "123") { 
+                document.getElementById('login-box').style.display='none'; 
+                document.getElementById('panel-ventas').style.display='block'; 
+                if(Notification.permission !== "granted") Notification.requestPermission(); 
+            } 
+        }
 
         function gestionarStock(accion) {
             let id = (accion === 'set') ? 'input-set' : (accion === 'add') ? 'input-add' : 'input-sub';
@@ -200,13 +204,12 @@
                 const lista = Object.entries(datos).reverse();
                 
                 if (cargadoInicial) {
-                    if (audioHabilitado) {
-                        sonidoCaja.currentTime = 0;
-                        sonidoCaja.play();
-                    }
                     if (Notification.permission === "granted") {
                         const u = lista[0][1];
-                        new Notification("🥤 ¡NUEVO PEDIDO!", { body: `${u.nombre} pidió ${u.cantidad} jugos.` });
+                        new Notification("🥤 ¡NUEVO PEDIDO!", { 
+                            body: `${u.nombre} pidió ${u.cantidad} jugos.`,
+                            icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+                        });
                     }
                 }
 
@@ -222,7 +225,7 @@
                         <td class="p-6 text-[10px] text-slate-400 font-mono italic">${p.fecha}</td>
                         <td class="p-6 uppercase font-black text-slate-800">${p.nombre}</td>
                         <td class="p-6">
-                            <a href="https://wa.me/${telLimpio}" target="_blank" class="text-teal-600 underline text-xs"> ${p.whatsapp}</a>
+                            <a href="https://wa.me/${telLimpio}" target="_blank" class="text-teal-600 underline text-xs">📱 ${p.whatsapp}</a>
                         </td>
                         <td class="p-6 text-center font-black text-4xl text-emerald-600 italic">${p.cantidad}</td>
                         <td class="p-6 text-center">
@@ -234,9 +237,8 @@
                 });
             }
 
-            // CAMBIO DE LÓGICA A 30% / 70%
             const gananciaTotal = totalPagado * 40;
-            const miParte = gananciaTotal * 0.30; // Aquí está el 30%
+            const miParte = gananciaTotal * 0.30;
             const resto = gananciaTotal - miParte;
 
             document.getElementById('cant-deuda').innerText = totalDeuda;
