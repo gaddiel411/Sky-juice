@@ -18,6 +18,8 @@
         .status-pendiente { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
         .status-pagado { background: #dcfce7; color: #16a34a; border: 1px solid #86efac; }
         
+        button { touch-action: manipulation; cursor: pointer; }
+
         .stat-capsule {
             border-radius: 3rem;
             padding: 1.5rem;
@@ -35,7 +37,6 @@
         }
         table { min-width: 700px; }
 
-        /* Modal Personalizado */
         #custom-modal {
             display: none;
             position: fixed;
@@ -72,7 +73,6 @@
     </div>
 
     <div id="panel-ventas" class="p-4 lg:p-10 max-w-[1600px] mx-auto pb-32">
-        
         <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-4">
             <h1 class="text-3xl lg:text-5xl font-[900] text-slate-800 italic uppercase">SKY JUICE <span class="text-teal-600">ADMINISTRADOR</span></h1>
             <div class="flex gap-2 w-full lg:w-auto">
@@ -165,14 +165,17 @@
         const stockRef = db.ref('stock_actual');
         const pedidosRef = db.ref('pedidos');
 
-        let cargadoInicial = false;
+        let ultimoConteoPedidos = 0; 
 
         function abrirModalLimpiar() {
             const modal = document.getElementById('custom-modal');
             const confirmBtn = document.getElementById('confirm-btn');
             modal.style.display = 'flex';
             confirmBtn.onclick = function() {
-                pedidosRef.remove().then(() => cerrarModal());
+                pedidosRef.remove().then(() => {
+                    ultimoConteoPedidos = 0;
+                    cerrarModal();
+                });
             };
         }
 
@@ -215,12 +218,20 @@
             let totalDeuda = 0;
             let totalPagado = 0;
             
-            if (datos) {
-                const lista = Object.entries(datos).reverse();
-                if (cargadoInicial && Notification.permission === "granted") {
-                    new Notification("🥤 ¡NUEVO PEDIDO!", { body: `${lista[0][1].nombre} pidió ${lista[0][1].cantidad}.` });
-                }
+            const lista = datos ? Object.entries(datos).reverse() : [];
+            const conteoActual = lista.length;
 
+            if (conteoActual > ultimoConteoPedidos && ultimoConteoPedidos !== 0) {
+                if (Notification.permission === "granted") {
+                    new Notification("🥤 ¡NUEVO PEDIDO!", { 
+                        body: `${lista[0][1].nombre} pidió ${lista[0][1].cantidad} jugos.`,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/3105/3105035.png'
+                    });
+                }
+            }
+            ultimoConteoPedidos = conteoActual;
+
+            if (datos) {
                 lista.forEach(([id, p]) => {
                     const est = p.pago || "ADEUDO";
                     const btnClass = est === "PAGADO" ? "status-pagado" : "status-pendiente";
@@ -237,20 +248,19 @@
                         </td>
                         <td class="p-6 text-center font-black text-4xl text-emerald-600 italic">${p.cantidad}</td>
                         <td class="p-6 text-center">
-                            <button onclick="cambiarEstatus('${id}', '${est}')" class="px-6 py-2 rounded-full text-[10px] font-black uppercase ${btnClass}">${txtBtn}</button>
+                            <button onclick="cambiarEstatus('${id}', '${est}')" class="px-6 py-2 rounded-full text-[10px] font-black uppercase shadow-sm active:scale-95 transition-transform ${btnClass}">${txtBtn}</button>
                         </td>
                     </tr>`;
                 });
             }
 
-            const gananciaTotal = totalPagado * 40;
+            const gananciaTotal = totalPagado * 40; // VUELTA A $40 PESOS
             document.getElementById('cant-deuda').innerText = totalDeuda;
             document.getElementById('cant-pagado').innerText = totalPagado;
             document.getElementById('ganancia-total').innerText = gananciaTotal;
             document.getElementById('mi-ganancia').innerText = "$" + (gananciaTotal * 0.30).toFixed(0);
             document.getElementById('el-resto').innerText = "$" + (gananciaTotal * 0.70).toFixed(0);
             document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-20 text-center font-black text-slate-300 uppercase italic">Sin ventas...</td></tr>';
-            cargadoInicial = true;
         });
     </script>
 </body>
