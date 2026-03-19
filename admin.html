@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Admin | En Vivo</title>
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="theme-color" content="#0d9488">
-    
+    <title>Sky Admin | Sky Juice</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -15,60 +11,55 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
         #panel-ventas { display: none; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-900">
 
     <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-sm w-full border-t-[10px] border-teal-600 text-center">
-            <h2 class="text-3xl font-[900] mb-8 uppercase italic">Sky Admin</h2>
-            <input type="password" id="passInput" placeholder="CONTRASEÑA" class="w-full p-5 border-2 rounded-2xl mb-6 text-center font-black text-2xl outline-none focus:border-teal-500 bg-slate-50">
-            <button onclick="verificar()" class="w-full bg-teal-600 text-white py-5 rounded-2xl font-[900] uppercase tracking-widest shadow-lg">ENTRAR</button>
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-xs border-t-8 border-teal-600 text-center">
+            <h2 class="text-2xl font-black mb-6 uppercase italic">Sky Admin</h2>
+            <input type="password" id="passInput" placeholder="PASS" class="w-full p-4 border-2 rounded-xl mb-4 text-center font-black text-xl outline-none focus:border-teal-500 bg-slate-50">
+            <button onclick="verificar()" class="w-full bg-teal-600 text-white py-4 rounded-xl font-black uppercase shadow-lg">Entrar</button>
         </div>
     </div>
 
-    <div id="panel-ventas" class="p-4 md:p-8 max-w-6xl mx-auto">
-        <h1 class="text-4xl font-[900] text-slate-800 italic uppercase mb-8">SKY JUICE <span class="text-teal-600">EN VIVO 🔴</span></h1>
+    <div id="panel-ventas" class="p-4 max-w-4xl mx-auto">
+        <h1 class="text-2xl font-black text-slate-800 italic uppercase mb-6 text-center">SKY JUICE <span class="text-teal-600">PANEL</span></h1>
 
-        <div class="bg-white p-6 rounded-[3rem] shadow-xl border mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-slate-50 p-4 rounded-3xl border text-center">
-                    <label class="text-[10px] font-black uppercase mb-2 block">Fijar</label>
-                    <div class="flex gap-2">
-                        <input type="number" id="input-set" class="w-full p-2 text-center font-black text-xl border rounded-xl">
-                        <button onclick="gestionarStock('set')" class="bg-blue-600 text-white px-4 rounded-xl font-black text-xs uppercase italic">Fijar</button>
-                    </div>
+        <div class="bg-white p-4 rounded-[2rem] shadow-lg border mb-6">
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <div class="bg-slate-50 p-2 rounded-xl border text-center">
+                    <label class="text-[8px] font-black uppercase block mb-1">Fijar</label>
+                    <input type="number" id="input-set" placeholder="0" class="w-full p-1 text-center font-bold border rounded mb-1">
+                    <button onclick="gestionarStock('set')" class="w-full bg-blue-600 text-white py-1 rounded text-[10px] font-black">SET</button>
                 </div>
-                <div class="bg-green-50 p-4 rounded-3xl border text-center">
-                    <label class="text-[10px] font-black uppercase mb-2 block text-green-700">Sumar</label>
-                    <div class="flex gap-2">
-                        <input type="number" id="input-add" class="w-full p-2 text-center font-black text-xl border rounded-xl">
-                        <button onclick="gestionarStock('add')" class="bg-green-600 text-white px-4 rounded-xl font-black text-xs uppercase italic">Add</button>
-                    </div>
+                <div class="bg-green-50 p-2 rounded-xl border text-center">
+                    <label class="text-[8px] font-black uppercase block mb-1">Suma</label>
+                    <input type="number" id="input-add" placeholder="0" class="w-full p-1 text-center font-bold border rounded mb-1">
+                    <button onclick="gestionarStock('add')" class="w-full bg-green-600 text-white py-1 rounded text-[10px] font-black">ADD</button>
                 </div>
-                <div class="bg-red-50 p-4 rounded-3xl border text-center">
-                    <label class="text-[10px] font-black uppercase mb-2 block text-red-700">Restar</label>
-                    <div class="flex gap-2">
-                        <input type="number" id="input-sub" class="w-full p-2 text-center font-black text-xl border rounded-xl">
-                        <button onclick="gestionarStock('sub')" class="bg-red-600 text-white px-4 rounded-xl font-black text-xs uppercase italic">Sub</button>
-                    </div>
+                <div class="bg-red-50 p-2 rounded-xl border text-center">
+                    <label class="text-[8px] font-black uppercase block mb-1">Resta</label>
+                    <input type="number" id="input-sub" placeholder="0" class="w-full p-1 text-center font-bold border rounded mb-1">
+                    <button onclick="gestionarStock('sub')" class="w-full bg-red-600 text-white py-1 rounded text-[10px] font-black">SUB</button>
                 </div>
             </div>
 
-            <div class="flex flex-col items-center pt-4">
-                <span id="stock-actual" class="text-[9rem] font-[900] text-slate-800 leading-none italic tracking-tighter">--</span>
-                <p class="text-teal-600 font-black uppercase text-xs tracking-widest mt-2">Existencia Actual</p>
+            <div class="flex flex-col items-center">
+                <span id="stock-actual" class="text-7xl font-[900] text-slate-800 leading-none italic tracking-tighter">--</span>
+                <p class="text-teal-600 font-black uppercase text-[10px] mt-2">Existencia Actual</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] shadow-xl border overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 text-[10px] text-slate-400 font-black uppercase border-b">
-                    <tr><th class="p-6">Fecha</th><th class="p-6">Cliente</th><th class="p-6">WhatsApp</th><th class="p-6 text-center italic">Cant.</th></tr>
-                </thead>
-                <tbody id="contenido-tabla" class="divide-y font-bold italic"></tbody>
-            </table>
+        <div class="bg-white rounded-2xl shadow-lg border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-[9px] text-slate-400 font-black uppercase border-b">
+                        <tr><th class="p-4">Cliente</th><th class="p-4">WhatsApp</th><th class="p-4 text-center">Cant.</th></tr>
+                    </thead>
+                    <tbody id="contenido-tabla" class="divide-y font-bold italic text-sm"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -83,7 +74,7 @@
         const db = firebase.database();
         const stockRef = db.ref('stock_actual');
 
-        function verificar() { if(document.getElementById('passInput').value === "123") { document.getElementById('login-box').style.display='none'; document.getElementById('panel-ventas').style.display='block'; solicitarPermisoNotif(); } }
+        function verificar() { if(document.getElementById('passInput').value === "123") { document.getElementById('login-box').style.display='none'; document.getElementById('panel-ventas').style.display='block'; } }
 
         function gestionarStock(accion) {
             let id = (accion === 'set') ? 'input-set' : (accion === 'add') ? 'input-add' : 'input-sub';
@@ -97,56 +88,26 @@
 
         stockRef.on('value', (s) => document.getElementById('stock-actual').innerText = s.val() || 0);
 
-        // --- SISTEMA DE NOTIFICACIONES ---
-        function solicitarPermisoNotif() {
-            if (Notification.permission !== "granted") {
-                Notification.requestPermission();
-            }
-        }
-
-        let cargadoInicial = false;
-        db.ref('pedidos').limitToLast(1).on('value', (snapshot) => {
-            if (!cargadoInicial) { 
-                cargadoInicial = true; 
-                return; 
-            }
-            
-            const datos = snapshot.val();
-            if (datos) {
-                const pedido = Object.values(datos)[0];
-                // Sonar y Notificar
-                if (Notification.permission === "granted") {
-                    new Notification("🥤 ¡NUEVO PEDIDO!", {
-                        body: `${pedido.nombre} pidió ${pedido.cantidad} jugos.`,
-                        icon: "https://cdn-icons-png.flaticon.com/512/3105/3105807.png"
-                    });
-                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2861/2861-preview.mp3');
-                    audio.play();
-                }
-            }
-        });
-
-        // Dibujar tabla completa
         db.ref('pedidos').on('value', (snapshot) => {
             const datos = snapshot.val();
             let html = "";
             if (datos) {
                 Object.values(datos).reverse().forEach(p => {
-                    html += `<tr class="border-b">
-                        <td class="p-6 text-[10px] text-slate-400 font-mono">${p.fecha}</td>
-                        <td class="p-6 font-black uppercase text-lg">${p.nombre}</td>
-                        <td class="p-6"><a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="text-teal-600 font-black underline italic">WhatsApp</a></td>
-                        <td class="p-6 text-center font-black text-5xl text-emerald-600">${p.cantidad}</td>
+                    // LINK CON EL NÚMERO DEL CLIENTE
+                    const telLimpio = p.whatsapp.replace(/\D/g,'');
+                    html += `<tr>
+                        <td class="p-4 font-black uppercase text-xs">${p.nombre}</td>
+                        <td class="p-4">
+                            <a href="https://wa.me/${telLimpio}" target="_blank" class="text-teal-600 underline text-xs">
+                                ${p.whatsapp}
+                            </a>
+                        </td>
+                        <td class="p-4 text-center font-black text-3xl text-emerald-600">${p.cantidad}</td>
                     </tr>`;
                 });
             }
-            document.getElementById('contenido-tabla').innerHTML = html;
+            document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="3" class="p-10 text-center text-xs">Sin pedidos</td></tr>';
         });
-
-        // Esto ayuda a que el celular lo detecte como App
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGZ1bmN0aW9uKGV2ZW50KSB7fSk7');
-        }
     </script>
 </body>
 </html>
