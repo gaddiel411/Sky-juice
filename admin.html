@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Juice | Master Admin</title>
+    <title>Sky Master Admin | Sonido Activo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -20,7 +20,7 @@
 
     <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-xs border-t-8 border-teal-600 text-center">
-            <h2 class="text-2xl font-black mb-6 uppercase italic italic">Sky Admin</h2>
+            <h2 class="text-2xl font-black mb-6 uppercase italic">Sky Admin</h2>
             <input type="password" id="passInput" placeholder="PASS" class="w-full h-14 p-4 border-2 rounded-xl mb-4 text-center font-black text-xl outline-none focus:border-teal-500 bg-slate-50">
             <button onclick="verificar()" class="w-full bg-teal-600 text-white py-4 rounded-xl font-black uppercase shadow-lg">ENTRAR</button>
         </div>
@@ -29,38 +29,38 @@
     <div id="panel-ventas" class="p-4 lg:p-10 max-w-[1600px] mx-auto">
         
         <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-4">
-            <h1 class="text-3xl lg:text-5xl font-[900] text-slate-800 italic uppercase">SKY JUICE <span class="text-teal-600">MASTER</span></h1>
-            <div class="flex gap-2 w-full lg:w-auto">
-                <button onclick="exportarExcel()" class="flex-1 lg:flex-none bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg hover:bg-emerald-700">📊 Excel</button>
-                <button onclick="limpiarPedidos()" class="flex-1 lg:flex-none bg-slate-800 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg">🧹 Limpiar Día</button>
+            <h1 class="text-3xl lg:text-5xl font-[900] text-slate-800 italic uppercase leading-none">SKY JUICE <span class="text-teal-600">MASTER</span></h1>
+            
+            <div class="flex flex-wrap gap-2 w-full lg:w-auto">
+                <button id="btn-audio" onclick="permitirAudio()" class="flex-1 lg:flex-none bg-orange-500 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg animate-pulse">🔊 Activar Sonido</button>
+                <button onclick="exportarExcel()" class="flex-1 lg:flex-none bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg">📊 Excel</button>
+                <button onclick="limpiarPedidos()" class="flex-1 lg:flex-none bg-slate-800 text-white px-6 py-3 rounded-2xl font-black uppercase text-xs shadow-lg text-white">🧹 Limpiar</button>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border">
-                    <h3 class="text-center font-black uppercase text-[10px] text-slate-400 mb-4 tracking-widest">Gestión de Stock</h3>
                     <div class="grid grid-cols-3 gap-2 mb-8">
                         <div class="bg-slate-50 p-2 rounded-2xl border text-center">
-                            <label class="text-[9px] font-black uppercase mb-1 block">Fijar</label>
+                            <label class="text-[9px] font-black mb-1 block">FIJAR</label>
                             <input type="number" id="input-set" class="w-full h-10 text-center font-bold border rounded-lg mb-2 text-sm outline-none">
                             <button onclick="gestionarStock('set')" class="w-full bg-blue-600 text-white py-2 rounded-lg text-[9px] font-black italic">SET</button>
                         </div>
                         <div class="bg-green-50 p-2 rounded-2xl border text-center">
-                            <label class="text-[9px] font-black uppercase mb-1 block">Suma</label>
+                            <label class="text-[9px] font-black mb-1 block">SUMA</label>
                             <input type="number" id="input-add" class="w-full h-10 text-center font-bold border rounded-lg mb-2 text-sm outline-none">
                             <button onclick="gestionarStock('add')" class="w-full bg-green-600 text-white py-2 rounded-lg text-[9px] font-black italic">ADD</button>
                         </div>
                         <div class="bg-red-50 p-2 rounded-2xl border text-center">
-                            <label class="text-[9px] font-black uppercase mb-1 block">Resta</label>
+                            <label class="text-[9px] font-black mb-1 block">RESTA</label>
                             <input type="number" id="input-sub" class="w-full h-10 text-center font-bold border rounded-lg mb-2 text-sm outline-none">
                             <button onclick="gestionarStock('sub')" class="w-full bg-red-600 text-white py-2 rounded-lg text-[9px] font-black italic">SUB</button>
                         </div>
                     </div>
                     <div class="text-center border-t pt-6">
                         <span id="stock-actual" class="text-8xl lg:text-[10rem] font-[900] text-slate-800 leading-none italic tracking-tighter">--</span>
-                        <p class="text-teal-600 font-black uppercase text-xs mt-4 italic tracking-widest text-center">Botellas Disponibles</p>
+                        <p class="text-teal-600 font-black uppercase text-[10px] mt-4 tracking-widest text-center italic">Existencia Actual</p>
                     </div>
                 </div>
             </div>
@@ -68,21 +68,19 @@
             <div class="lg:col-span-8 bg-white rounded-[2.5rem] shadow-xl border overflow-hidden">
                 <div class="overflow-x-auto">
                     <table id="tabla-pedidos" class="w-full text-left">
-                        <thead class="bg-slate-50 text-[10px] lg:text-[12px] text-slate-400 font-black uppercase border-b">
+                        <thead class="bg-slate-50 text-[10px] text-slate-400 font-black uppercase border-b">
                             <tr>
-                                <th class="p-6">Fecha/Hora</th>
+                                <th class="p-6">Fecha</th>
                                 <th class="p-6">Cliente</th>
                                 <th class="p-6">WhatsApp</th>
                                 <th class="p-6 text-center italic">Cant.</th>
-                                <th class="p-6 text-center italic">Pago</th>
+                                <th class="p-6 text-center">Estatus</th>
                             </tr>
                         </thead>
-                        <tbody id="contenido-tabla" class="divide-y font-bold italic text-sm lg:text-base text-slate-700">
-                            </tbody>
+                        <tbody id="contenido-tabla" class="divide-y font-bold italic text-sm lg:text-base text-slate-700"></tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -99,6 +97,18 @@
         const pedidosRef = db.ref('pedidos');
 
         let cargadoInicial = false;
+        let audioHabilitado = false;
+        const sonidoCaja = new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3');
+
+        function permitirAudio() {
+            audioHabilitado = true;
+            sonidoCaja.play(); // Suena una vez para confirmar
+            sonidoCaja.pause();
+            document.getElementById('btn-audio').classList.remove('animate-pulse', 'bg-orange-500');
+            document.getElementById('btn-audio').classList.add('bg-slate-200', 'text-slate-400');
+            document.getElementById('btn-audio').innerText = "🔊 AUDIO LISTO";
+            alert("¡Sonido Activado! Ya escucharás la caja registradora en cada venta.");
+        }
 
         function verificar() { if(document.getElementById('passInput').value === "123") { document.getElementById('login-box').style.display='none'; document.getElementById('panel-ventas').style.display='block'; if(Notification.permission !== "granted") Notification.requestPermission(); } }
 
@@ -117,12 +127,12 @@
             pedidosRef.child(id).update({ pago: nuevoEstatus });
         }
 
-        function limpiarPedidos() { if(confirm("¿Seguro que quieres borrar todos los pedidos de hoy?")) pedidosRef.remove(); }
+        function limpiarPedidos() { if(confirm("¿Borrar todo el historial?")) pedidosRef.remove(); }
 
         function exportarExcel() {
             const table = document.getElementById("tabla-pedidos");
             const wb = XLSX.utils.table_to_book(table);
-            XLSX.writeFile(wb, "SkyJuice_Pedidos.xlsx");
+            XLSX.writeFile(wb, "SkyJuice_Ventas.xlsx");
         }
 
         stockRef.on('value', (s) => document.getElementById('stock-actual').innerText = s.val() || 0);
@@ -134,35 +144,44 @@
             if (datos) {
                 const lista = Object.entries(datos).reverse();
                 
-                // Sonido para pedido nuevo
+                // DISPARAR ALERTAS SI ES PEDIDO NUEVO
                 if (cargadoInicial) {
-                    new Audio('https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3').play();
-                    const ultimo = lista[0][1];
-                    new Notification("🥤 ¡NUEVO PEDIDO!", { body: `${ultimo.nombre} pidió ${ultimo.cantidad} jugos.` });
+                    if (audioHabilitado) {
+                        sonidoCaja.currentTime = 0;
+                        sonidoCaja.play().catch(e => console.log("Falta clic inicial"));
+                    }
+                    if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+                    
+                    if (Notification.permission === "granted") {
+                        const ultimo = lista[0][1];
+                        new Notification("🥤 ¡NUEVO PEDIDO!", { 
+                            body: `${ultimo.nombre} pidió ${ultimo.cantidad} jugos.`,
+                            icon: "https://cdn-icons-png.flaticon.com/512/3105/3105807.png" 
+                        });
+                    }
                 }
 
                 lista.forEach(([id, p]) => {
-                    const estatus = p.pago || "PENDIENTE";
-                    const btnClass = estatus === "PAGADO" ? "status-pagado" : "status-pendiente";
-                    const icono = estatus === "PAGADO" ? "✅" : "❌";
+                    const est = p.pago || "PENDIENTE";
+                    const btnClass = est === "PAGADO" ? "status-pagado" : "status-pendiente";
                     const telLimpio = p.whatsapp.replace(/\D/g,'');
 
-                    html += `<tr>
-                        <td class="p-6 text-[10px] text-slate-400 font-mono italic">${p.fecha}</td>
-                        <td class="p-6 uppercase text-slate-900 font-black">${p.nombre}</td>
+                    html += `<tr class="border-b">
+                        <td class="p-6 text-[10px] text-slate-400 font-mono">${p.fecha}</td>
+                        <td class="p-6 uppercase font-black text-slate-800">${p.nombre}</td>
                         <td class="p-6">
                             <a href="https://wa.me/${telLimpio}" target="_blank" class="text-teal-600 underline text-xs">📱 ${p.whatsapp}</a>
                         </td>
                         <td class="p-6 text-center font-black text-4xl text-emerald-600">${p.cantidad}</td>
                         <td class="p-6 text-center">
-                            <button onclick="cambiarEstatus('${id}', '${estatus}')" class="px-4 py-2 rounded-full text-[10px] font-black uppercase transition-all ${btnClass}">
-                                ${icono} ${estatus}
+                            <button onclick="cambiarEstatus('${id}', '${est}')" class="px-4 py-2 rounded-full text-[10px] font-[900] uppercase ${btnClass}">
+                                ${est === "PAGADO" ? "✅ PAGADO" : "❌ PENDIENTE"}
                             </button>
                         </td>
                     </tr>`;
                 });
             } else {
-                html = '<tr><td colspan="5" class="p-20 text-center font-bold text-slate-300 italic uppercase">Esperando el primer pedido del día... 🥤</td></tr>';
+                html = '<tr><td colspan="5" class="p-20 text-center font-bold text-slate-300 italic uppercase">Esperando ventas... 🥤</td></tr>';
             }
             document.getElementById('contenido-tabla').innerHTML = html;
             cargadoInicial = true;
