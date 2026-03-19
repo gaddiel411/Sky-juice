@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sky Juice | Financial Admin</title>
+    <title>Sky Juice | Administrador</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -26,15 +26,39 @@
             min-height: 140px;
         }
 
-        /* Mejora para el scroll en móviles */
         .table-responsive {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-        table { min-width: 600px; } /* Asegura que la tabla no se colapse en pantallas mini */
+        table { min-width: 700px; }
+
+        /* Modal Personalizado */
+        #custom-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-900">
+
+    <div id="custom-modal">
+        <div class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl border-t-8 border-slate-800 text-center">
+            <div class="text-4xl mb-4">⚠️</div>
+            <h3 class="text-xl font-black uppercase italic mb-2 text-slate-800">Sky Juice Administrador</h3>
+            <p id="modal-text" class="text-slate-500 font-bold text-sm mb-8 italic">¿Estás seguro de que deseas limpiar todo el historial y realizar el cierre de caja?</p>
+            <div class="flex gap-3">
+                <button onclick="cerrarModal()" class="flex-1 bg-slate-100 text-slate-500 py-4 rounded-2xl font-black uppercase text-[10px]">Cancelar</button>
+                <button id="confirm-btn" class="flex-1 bg-red-600 text-white py-4 rounded-2xl font-black uppercase text-[10px] shadow-lg shadow-red-200">Limpiar Todo</button>
+            </div>
+        </div>
+    </div>
 
     <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl w-full max-w-xs border-t-8 border-teal-600 text-center">
@@ -47,10 +71,10 @@
     <div id="panel-ventas" class="p-4 lg:p-10 max-w-[1600px] mx-auto pb-32">
         
         <div class="flex flex-col lg:flex-row justify-between items-center mb-8 gap-4">
-            <h1 class="text-3xl lg:text-5xl font-[900] text-slate-800 italic uppercase">SKY JUICE <span class="text-teal-600">FINANCE</span></h1>
+            <h1 class="text-3xl lg:text-5xl font-[900] text-slate-800 italic uppercase">SKY JUICE <span class="text-teal-600">ADMINISTRADOR</span></h1>
             <div class="flex gap-2 w-full lg:w-auto">
                 <button onclick="exportarExcel()" class="flex-1 lg:flex-none bg-emerald-600 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px]">📊 Excel</button>
-                <button onclick="limpiarPedidos()" class="flex-1 lg:flex-none bg-slate-800 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px]">🧹 Limpiar</button>
+                <button onclick="abrirModalLimpiar()" class="flex-1 lg:flex-none bg-slate-800 text-white px-6 py-3 rounded-2xl font-black uppercase text-[10px]">🧹 Limpiar</button>
             </div>
         </div>
 
@@ -87,7 +111,7 @@
                                 <th class="p-6">Cliente</th>
                                 <th class="p-6">WhatsApp</th>
                                 <th class="p-6 text-center italic">Cant.</th>
-                                <th class="p-6 text-center italic">Pago</th>
+                                <th class="p-6 text-center italic">Estatus</th>
                             </tr>
                         </thead>
                         <tbody id="contenido-tabla" class="divide-y font-bold italic text-sm lg:text-base"></tbody>
@@ -97,37 +121,27 @@
         </div>
 
         <div class="bg-white p-8 rounded-[3rem] shadow-2xl border-t-4 border-teal-600">
-            <h3 class="text-center text-slate-400 font-black uppercase text-xs mb-6 tracking-widest">Resumen Financiero</h3>
+            <h3 class="text-center text-slate-400 font-black uppercase text-xs mb-6 tracking-widest">Resumen de Administrador</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
                 <div class="stat-capsule bg-white border-2 border-red-50">
                     <span id="cant-deuda" class="text-7xl font-black text-red-500 italic leading-none">0</span>
-                    <p class="text-[11px] font-black uppercase tracking-tighter text-slate-400 mt-2">Jugos en Deuda</p>
+                    <p class="text-[11px] font-black uppercase tracking-tighter text-slate-400 mt-2">Jugos en Adeudo</p>
                 </div>
-
                 <div class="stat-capsule bg-white border-2 border-emerald-50">
                     <span id="cant-pagado" class="text-7xl font-black text-emerald-500 italic leading-none">0</span>
                     <p class="text-[11px] font-black uppercase tracking-tighter text-slate-400 mt-2">Jugos Pagados</p>
                 </div>
-
                 <div class="stat-capsule bg-slate-800 relative overflow-hidden">
                     <div class="flex items-center gap-1">
                         <span class="text-3xl font-black text-teal-400">$</span>
                         <span id="ganancia-total" class="text-7xl font-black text-white italic leading-none">0</span>
-                        <button onclick="toggleReparto()" class="text-teal-400 hover:scale-110 transition-transform ml-2 text-2xl" title="Ver Reparto">📈</button>
+                        <button onclick="toggleReparto()" class="text-teal-400 hover:scale-110 transition-transform ml-2 text-2xl">📈</button>
                     </div>
                     <p class="text-[11px] font-black uppercase tracking-tighter text-teal-500/50 mt-2">Ganancia Total</p>
-                    
                     <div id="box-reparto" class="hidden absolute inset-0 bg-slate-900/95 flex items-center justify-center p-4">
                         <div class="grid grid-cols-2 gap-8 text-center">
-                            <div>
-                                <p class="text-[10px] text-teal-500 font-black uppercase">Tu 30%</p>
-                                <p id="mi-ganancia" class="text-3xl font-black text-white">$0</p>
-                            </div>
-                            <div>
-                                <p class="text-[10px] text-slate-400 font-black uppercase">Resto (70%)</p>
-                                <p id="el-resto" class="text-3xl font-black text-slate-300">$0</p>
-                            </div>
+                            <div><p class="text-[10px] text-teal-500 font-black uppercase">Tu 30%</p><p id="mi-ganancia" class="text-3xl font-black text-white">$0</p></div>
+                            <div><p class="text-[10px] text-slate-400 font-black uppercase">Fondo (70%)</p><p id="el-resto" class="text-3xl font-black text-slate-300">$0</p></div>
                         </div>
                         <button onclick="toggleReparto()" class="absolute top-2 right-4 text-white font-bold">✕</button>
                     </div>
@@ -150,9 +164,17 @@
 
         let cargadoInicial = false;
 
-        function toggleReparto() {
-            document.getElementById('box-reparto').classList.toggle('hidden');
+        function abrirModalLimpiar() {
+            const modal = document.getElementById('custom-modal');
+            const confirmBtn = document.getElementById('confirm-btn');
+            modal.style.display = 'flex';
+            confirmBtn.onclick = function() {
+                pedidosRef.remove().then(() => cerrarModal());
+            };
         }
+
+        function cerrarModal() { document.getElementById('custom-modal').style.display = 'none'; }
+        function toggleReparto() { document.getElementById('box-reparto').classList.toggle('hidden'); }
 
         function verificar() { 
             if(document.getElementById('passInput').value === "123") { 
@@ -173,22 +195,12 @@
         }
 
         function cambiarEstatus(id, estatusActual) {
-            const nuevoEstatus = estatusActual === "PAGADO" ? "PENDIENTE" : "PAGADO";
+            const nuevoEstatus = (estatusActual === "PAGADO") ? "ADEUDO" : "PAGADO";
             pedidosRef.child(id).update({ pago: nuevoEstatus });
         }
 
-        function limpiarPedidos() {
-            const confirmacion = confirm("⚠️ ATENCIÓN: Estás por eliminar todo el historial de pedidos y el corte financiero actual. Esta acción no se puede deshacer.\n\n¿Deseas proceder con el cierre de caja?");
-            if(confirmacion) {
-                pedidosRef.remove().then(() => {
-                    alert("✅ Sistema reiniciado correctamente.");
-                });
-            }
-        }
-
         function exportarExcel() {
-            const table = document.getElementById("tabla-pedidos");
-            const wb = XLSX.utils.table_to_book(table);
+            const wb = XLSX.utils.table_to_book(document.getElementById("tabla-pedidos"));
             XLSX.writeFile(wb, "SkyJuice_Corte.xlsx");
         }
 
@@ -202,21 +214,14 @@
             
             if (datos) {
                 const lista = Object.entries(datos).reverse();
-                
-                if (cargadoInicial) {
-                    if (Notification.permission === "granted") {
-                        const u = lista[0][1];
-                        new Notification("🥤 ¡NUEVO PEDIDO!", { 
-                            body: `${u.nombre} pidió ${u.cantidad} jugos.`,
-                            icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
-                        });
-                    }
+                if (cargadoInicial && Notification.permission === "granted") {
+                    new Notification("🥤 ¡NUEVO PEDIDO!", { body: `${lista[0][1].nombre} pidió ${lista[0][1].cantidad}.` });
                 }
 
                 lista.forEach(([id, p]) => {
-                    const est = p.pago || "PENDIENTE";
+                    const est = p.pago || "ADEUDO";
                     const btnClass = est === "PAGADO" ? "status-pagado" : "status-pendiente";
-                    const telLimpio = p.whatsapp.replace(/\D/g,'');
+                    const txtBtn = est === "PAGADO" ? "✅ PAGADO" : "❌ ADEUDO";
                     
                     if (est === "PAGADO") totalPagado += parseInt(p.cantidad);
                     else totalDeuda += parseInt(p.cantidad);
@@ -225,29 +230,23 @@
                         <td class="p-6 text-[10px] text-slate-400 font-mono italic">${p.fecha}</td>
                         <td class="p-6 uppercase font-black text-slate-800">${p.nombre}</td>
                         <td class="p-6">
-                            <a href="https://wa.me/${telLimpio}" target="_blank" class="text-teal-600 underline text-xs">📱 ${p.whatsapp}</a>
+                            <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="text-teal-600 font-mono text-sm underline">${p.whatsapp}</a>
                         </td>
                         <td class="p-6 text-center font-black text-4xl text-emerald-600 italic">${p.cantidad}</td>
                         <td class="p-6 text-center">
-                            <button onclick="cambiarEstatus('${id}', '${est}')" class="px-4 py-2 rounded-full text-[10px] font-black uppercase ${btnClass}">
-                                ${est === "PAGADO" ? "✅ PAGADO" : "❌ PENDIENTE"}
-                            </button>
+                            <button onclick="cambiarEstatus('${id}', '${est}')" class="px-6 py-2 rounded-full text-[10px] font-black uppercase ${btnClass}">${txtBtn}</button>
                         </td>
                     </tr>`;
                 });
             }
 
             const gananciaTotal = totalPagado * 40;
-            const miParte = gananciaTotal * 0.30;
-            const resto = gananciaTotal - miParte;
-
             document.getElementById('cant-deuda').innerText = totalDeuda;
             document.getElementById('cant-pagado').innerText = totalPagado;
             document.getElementById('ganancia-total').innerText = gananciaTotal;
-            document.getElementById('mi-ganancia').innerText = "$" + miParte.toFixed(0);
-            document.getElementById('el-resto').innerText = "$" + resto.toFixed(0);
-            
-            document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-20 text-center font-black text-slate-300 uppercase italic tracking-widest">Esperando ventas...</td></tr>';
+            document.getElementById('mi-ganancia').innerText = "$" + (gananciaTotal * 0.30).toFixed(0);
+            document.getElementById('el-resto').innerText = "$" + (gananciaTotal * 0.70).toFixed(0);
+            document.getElementById('contenido-tabla').innerHTML = html || '<tr><td colspan="5" class="p-20 text-center font-black text-slate-300 uppercase italic">Sin ventas...</td></tr>';
             cargadoInicial = true;
         });
     </script>
