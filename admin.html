@@ -18,89 +18,132 @@
 
     <div id="login-box" class="min-h-screen flex items-center justify-center p-4">
         <div class="bg-white p-10 rounded-[3rem] shadow-2xl max-w-sm w-full border-t-[10px] border-teal-600 text-center">
-            <h2 class="text-3xl font-[900] mb-8 uppercase italic">Sky Admin</h2>
-            <input type="password" id="passInput" placeholder="Contraseña" class="w-full p-5 border-2 rounded-2xl mb-6 text-center font-black text-2xl outline-none focus:border-teal-500">
-            <button onclick="verificar()" class="w-full bg-teal-600 text-white py-5 rounded-2xl font-[900] uppercase tracking-widest">ENTRAR</button>
+            <h2 class="text-3xl font-[900] mb-8 uppercase italic text-slate-800">Sky Admin</h2>
+            <input type="password" id="passInput" placeholder="CONTRASEÑA" class="w-full p-5 border-2 rounded-2xl mb-6 text-center font-black text-2xl outline-none focus:border-teal-500 bg-slate-50">
+            <button onclick="verificar()" class="w-full bg-teal-600 text-white py-5 rounded-2xl font-[900] uppercase tracking-widest hover:bg-teal-700 transition-all shadow-lg">ENTRAR</button>
         </div>
     </div>
 
     <div id="panel-ventas" class="p-4 md:p-8 max-w-6xl mx-auto">
-        <h1 class="text-4xl font-[900] text-slate-800 italic uppercase mb-8">SKY JUICE <span class="text-teal-600">OBREGÓN</span> 🔴</h1>
+        <h1 class="text-4xl font-[900] text-slate-800 italic uppercase mb-8">SKY JUICE <span class="text-teal-600 underline text-3xl">PANEL EN VIVO 🔴</span></h1>
 
         <div class="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-200 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="bg-slate-50 p-6 rounded-3xl border-2">
-                    <label class="text-[10px] font-black uppercase block mb-3 text-center">Fijar Total</label>
+                
+                <div class="bg-slate-50 p-6 rounded-3xl border-2 border-slate-100 text-center">
+                    <label class="text-[10px] font-black text-slate-500 uppercase block mb-3 italic">Fijar Total</label>
                     <div class="flex gap-2">
-                        <input type="number" id="input-set" placeholder="0" class="w-full p-3 text-center font-black text-2xl border-2 rounded-2xl">
-                        <button onclick="gestionarStock('set')" class="bg-blue-600 text-white px-5 rounded-2xl font-black uppercase text-xs">Fijar</button>
+                        <input type="number" id="input-set" placeholder="0" class="w-full p-3 text-center font-black text-2xl border-2 rounded-2xl outline-none focus:border-blue-500">
+                        <button onclick="gestionarStock('set')" class="bg-blue-600 text-white px-5 rounded-2xl font-black uppercase text-xs hover:bg-blue-700">Fijar</button>
                     </div>
                 </div>
+
                 <div class="bg-green-50 p-6 rounded-3xl border-2 border-green-100 text-center">
-                    <label class="text-[10px] font-black text-green-700 uppercase block mb-3">Agregar</label>
+                    <label class="text-[10px] font-black text-green-700 uppercase block mb-3 italic">Agregar</label>
                     <div class="flex gap-2">
-                        <input type="number" id="input-add" placeholder="+" class="w-full p-3 text-center font-black text-2xl border-2 border-green-200 rounded-2xl text-green-700">
-                        <button onclick="gestionarStock('add')" class="bg-green-600 text-white px-5 rounded-2xl font-black uppercase text-xs">Sumar</button>
+                        <input type="number" id="input-add" placeholder="+" class="w-full p-3 text-center font-black text-2xl border-2 border-green-200 rounded-2xl text-green-700 outline-none focus:border-green-500">
+                        <button onclick="gestionarStock('add')" class="bg-green-600 text-white px-5 rounded-2xl font-black uppercase text-xs hover:bg-green-700">Sumar</button>
                     </div>
                 </div>
+
                 <div class="bg-red-50 p-6 rounded-3xl border-2 border-red-100 text-center">
-                    <label class="text-[10px] font-black text-red-700 uppercase block mb-3">Retirar</label>
+                    <label class="text-[10px] font-black text-red-700 uppercase block mb-3 italic">Retirar</label>
                     <div class="flex gap-2">
-                        <input type="number" id="input-sub" placeholder="-" class="w-full p-3 text-center font-black text-2xl border-2 border-red-200 rounded-2xl text-red-700">
-                        <button onclick="gestionarStock('sub')" class="bg-red-600 text-white px-5 rounded-2xl font-black uppercase text-xs">Restar</button>
+                        <input type="number" id="input-sub" placeholder="-" class="w-full p-3 text-center font-black text-2xl border-2 border-red-200 rounded-2xl text-red-700 outline-none focus:border-red-500">
+                        <button onclick="gestionarStock('sub')" class="bg-red-600 text-white px-5 rounded-2xl font-black uppercase text-xs hover:bg-red-700">Restar</button>
                     </div>
                 </div>
+
             </div>
 
-            <div class="flex flex-col items-center border-t pt-8">
+            <div class="flex flex-col items-center border-t border-slate-100 pt-8">
                 <span id="stock-actual" class="text-[10rem] font-[900] text-slate-800 leading-none italic tracking-tighter">--</span>
-                <span class="text-teal-600 font-[900] uppercase text-sm mt-4 tracking-[0.5em] italic text-center">Botellas en Existencia</span>
+                <span class="text-teal-600 font-[900] uppercase text-sm mt-4 tracking-[0.5em] italic">Jugos en Existencia</span>
             </div>
         </div>
 
         <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-200 overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-slate-50 text-[10px] text-slate-400 uppercase font-[900] tracking-widest border-b">
-                    <tr><th class="p-6 text-center">Fecha</th><th class="p-6">Cliente</th><th class="p-6">WhatsApp</th><th class="p-6 text-center">Cant.</th></tr>
-                </thead>
-                <tbody id="contenido-tabla" class="divide-y divide-slate-100 font-bold italic"></tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-[10px] text-slate-400 uppercase font-[900] tracking-[0.2em] border-b">
+                        <tr>
+                            <th class="p-6 text-center">Fecha/Hora</th>
+                            <th class="p-6">Nombre Cliente</th>
+                            <th class="p-6">Acción</th>
+                            <th class="p-6 text-center italic">Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contenido-tabla" class="divide-y divide-slate-100 italic">
+                        </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4", authDomain: "skyjuice-25d01.firebaseapp.com", databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com", projectId: "skyjuice-25d01" };
+        // Configuración de Firebase (Tu Proyecto)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqb6MTA5HwLbMtpqyyn50oZQduJKvRIu4",
+            authDomain: "skyjuice-25d01.firebaseapp.com",
+            databaseURL: "https://skyjuice-25d01-default-rtdb.firebaseio.com",
+            projectId: "skyjuice-25d01"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const stockRef = db.ref('stock_actual');
 
-        function verificar() { if(document.getElementById('passInput').value === "123") { document.getElementById('login-box').style.display='none'; document.getElementById('panel-ventas').style.display='block'; } }
-
-        function gestionarStock(accion) {
-            let id = (accion === 'set') ? 'input-set' : (accion === 'add') ? 'input-add' : 'input-sub';
-            let val = parseInt(document.getElementById(id).value);
-            if (isNaN(val)) return;
-            if (accion === 'set') stockRef.set(val);
-            else if (accion === 'add') stockRef.transaction(c => (c || 0) + val);
-            else if (accion === 'sub') stockRef.transaction(c => Math.max(0, (c || 0) - val));
-            document.getElementById(id).value = ""; 
+        // Login
+        function verificar() {
+            const pass = document.getElementById('passInput').value;
+            if(pass === "123") {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('panel-ventas').style.display = 'block';
+            } else {
+                alert("❌ Contraseña incorrecta");
+            }
         }
 
-        stockRef.on('value', (s) => document.getElementById('stock-actual').innerText = s.val() || 0);
+        // Gestión de Stock (Tus botones originales)
+        function gestionarStock(accion) {
+            let id = (accion === 'set') ? 'input-set' : (accion === 'add') ? 'input-add' : 'input-sub';
+            let input = document.getElementById(id);
+            let val = parseInt(input.value);
+            
+            if (isNaN(val)) return;
 
-        // AQUÍ ESTÁ EL TIEMPO REAL:
+            if (accion === 'set') {
+                stockRef.set(val);
+            } else if (accion === 'add') {
+                stockRef.transaction(c => (c || 0) + val);
+            } else if (accion === 'sub') {
+                stockRef.transaction(c => Math.max(0, (c || 0) - val));
+            }
+            input.value = ""; 
+        }
+
+        // Actualizar contador gigante en vivo
+        stockRef.on('value', (snap) => {
+            document.getElementById('stock-actual').innerText = snap.val() || 0;
+        });
+
+        // TABLA TIEMPO REAL (Recibe datos del Checkout)
         db.ref('pedidos').on('value', (snapshot) => {
             const datos = snapshot.val();
             let html = "";
             if (datos) {
+                // Invertimos para que el pedido más nuevo salga arriba
                 Object.values(datos).reverse().forEach(p => {
-                    html += `<tr>
-                        <td class="p-6 text-[10px] text-slate-400 font-mono text-center">${p.fecha}</td>
-                        <td class="p-6 font-black text-slate-800 text-xl uppercase italic">${p.nombre}</td>
-                        <td class="p-6"><a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="text-teal-600 font-black underline">📱 WhatsApp</a></td>
-                        <td class="p-6 text-center font-black text-5xl text-emerald-600">${p.cantidad}</td>
+                    html += `<tr class="hover:bg-slate-50 transition-colors border-b">
+                        <td class="p-6 text-[11px] text-slate-400 font-mono text-center">${p.fecha}</td>
+                        <td class="p-6 font-black text-slate-800 uppercase text-xl">${p.nombre}</td>
+                        <td class="p-6">
+                            <a href="https://wa.me/${p.whatsapp.replace(/\D/g,'')}" target="_blank" class="bg-teal-50 text-teal-600 px-4 py-2 rounded-full text-xs font-black uppercase">📱 WhatsApp</a>
+                        </td>
+                        <td class="p-6 text-center font-black text-6xl text-emerald-600">${p.cantidad}</td>
                     </tr>`;
                 });
+            } else {
+                html = '<tr><td colspan="4" class="p-20 text-center font-bold text-slate-300 italic uppercase">Esperando el primer pedido... 🥤</td></tr>';
             }
             document.getElementById('contenido-tabla').innerHTML = html;
         });
