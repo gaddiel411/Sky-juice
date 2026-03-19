@@ -12,14 +12,11 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            /* Evita el zoom por doble clic en toda la página */
             touch-action: manipulation; 
+            overflow-x: hidden;
         }
 
-        /* Aplicado específicamente a botones para mayor seguridad */
-        button {
-            touch-action: manipulation;
-        }
+        button { touch-action: manipulation; }
 
         input::-webkit-outer-spin-button, 
         input::-webkit-inner-spin-button { 
@@ -30,22 +27,22 @@
 </head>
 <body class="bg-slate-50 text-slate-900">
 
-    <div class="max-w-md mx-auto min-h-screen flex flex-col p-6">
-        <header class="text-center py-10">
+    <div class="max-w-md mx-auto min-h-screen flex flex-col p-5 sm:p-6">
+        <header class="text-center py-8">
             <h1 class="text-5xl font-[900] italic tracking-tighter uppercase text-slate-800">SKY <span class="text-emerald-500">JUICE</span></h1>
             <p class="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">Natural & Fresh • Obregón</p>
         </header>
 
         <div class="bg-white rounded-[3rem] shadow-2xl shadow-emerald-100/50 overflow-hidden border border-slate-100">
             <div class="p-2">
-                <img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1000&auto=format&fit=crop" class="w-full h-80 object-cover rounded-[2.5rem]">
+                <img src="https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=1000&auto=format&fit=crop" class="w-full h-72 sm:h-80 object-cover rounded-[2.5rem]">
             </div>
             
             <div class="p-8">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h2 class="text-3xl font-[900] uppercase text-slate-800 italic">Jugo de Caña</h2>
-                        <p class="text-xs text-slate-400 font-black uppercase tracking-widest">Botella Fresh 500ml</p>
+                        <h2 class="text-3xl font-[900] uppercase text-slate-800 italic leading-none">Jugo de Caña</h2>
+                        <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Botella Fresh 500ml</p>
                     </div>
                     <span class="text-3xl font-[900] text-emerald-500">$40</span>
                 </div>
@@ -55,21 +52,24 @@
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                     </span>
-                    <span class="text-xs font-[900] uppercase tracking-widest text-emerald-700">
-                        ¡Quedan <span id="stock-num" class="text-lg">--</span> disponibles!
+                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700">
+                        ¡Quedan <span id="stock-num" class="text-base">--</span> disponibles!
                     </span>
                 </div>
 
-                <div class="flex items-center justify-between bg-slate-50 p-5 rounded-[2rem] mb-8 border-2 border-slate-100">
-                    <span class="text-xs font-black uppercase text-slate-400 px-2 tracking-widest">¿Cuántos?</span>
-                    <div class="flex items-center gap-8">
-                        <button onclick="cambiarCantCliente(-1)" class="w-10 h-10 flex items-center justify-center font-black text-3xl text-slate-300 hover:text-emerald-500 transition-colors">-</button>
-                        <input type="number" id="cant-cliente" value="1" readonly class="w-12 bg-transparent text-center font-[900] text-3xl text-slate-800 outline-none">
-                        <button onclick="cambiarCantCliente(1)" class="w-10 h-10 flex items-center justify-center font-black text-3xl text-slate-300 hover:text-emerald-500 transition-colors">+</button>
+                <div class="flex items-center justify-between bg-slate-50 p-4 sm:p-5 rounded-[2.5rem] mb-8 border-2 border-slate-100 w-full box-border">
+                    <span class="text-[10px] font-black uppercase text-slate-400 tracking-tighter">¿CUÁNTOS?</span>
+                    
+                    <div class="flex items-center justify-end gap-3 sm:gap-6 flex-1 text-right">
+                        <button onclick="cambiarCantCliente(-1)" class="w-10 h-10 flex items-center justify-center font-black text-2xl text-slate-300 hover:text-emerald-500 active:scale-90 transition-all">-</button>
+                        
+                        <input type="number" id="cant-cliente" value="1" readonly class="w-8 bg-transparent text-center font-[900] text-3xl text-slate-800 outline-none">
+                        
+                        <button onclick="cambiarCantCliente(1)" class="w-10 h-10 flex items-center justify-center font-black text-2xl text-slate-300 hover:text-emerald-500 active:scale-90 transition-all mr-1">+</button>
                     </div>
                 </div>
 
-                <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-[900] py-6 rounded-[2rem] shadow-2xl hover:bg-black transition-all active:scale-95 uppercase tracking-[0.2em] text-lg disabled:bg-slate-200 disabled:text-slate-400">
+                <button onclick="irAlPago()" id="btn-comprar" class="w-full bg-slate-900 text-white font-[900] py-6 rounded-[2.5rem] shadow-2xl hover:bg-black transition-all active:scale-95 uppercase tracking-[0.2em] text-lg disabled:bg-slate-200 disabled:text-slate-400">
                     ORDENAR AHORA
                 </button>
             </div>
